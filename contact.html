@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact Petros Curious Mind. We'd love to hear from you.">
+  <title>Contact Us | Petros Curious Mind</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .contact-wrap { max-width: 760px; margin: 0 auto; }
+    .contact-intro { text-align: center; margin: 0 auto 32px; max-width: 720px; }
+    .contact-intro p { line-height: 1.8; }
+    .contact-form { background: #fff; padding: 28px; border-radius: 18px; box-shadow: 0 8px 28px rgba(10,45,90,.09); }
+    .contact-form label { display:block; margin: 0 0 8px; font-weight:700; }
+    .contact-form input, .contact-form textarea {
+      display:block; width:100%; box-sizing:border-box; margin:0 0 20px; padding:13px 14px;
+      border:1px solid #ccd7e5; border-radius:10px; font:inherit; background:#fff;
+    }
+    .contact-form textarea { min-height:160px; resize:vertical; }
+    .contact-form button {
+      border:0; border-radius:999px; padding:13px 24px; background:#0878e8; color:#fff;
+      font:inherit; font-weight:700; cursor:pointer;
+    }
+    .contact-form button:hover { background:#0758ad; }
+    .form-note { margin-top:16px; color:#5d6b7c; font-size:.92rem; line-height:1.6; }
+    @media(max-width:600px){ .contact-form{padding:20px;} }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html" aria-label="Petros Curious Mind home">Petros Curious Mind</a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+      <nav class="navigation" id="navigation" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="stories.html">Stories</a>
+        <a href="about.html">About</a>
+        <a href="contact.html" aria-current="page">Contact</a>
+        <a href="signin.html">Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-content">
+        <p class="eyebrow">Get in touch</p>
+        <h1>Contact Us</h1>
+        <p>We'd Love to Hear From You</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container contact-wrap">
+        <div class="contact-intro">
+          <h2>Get in Touch</h2>
+          <p>Whether you have a question, feedback, or simply want to reach out, we'd be happy to hear from you.</p>
+          <p>Have something to share with us? You can contact the Petros Curious Mind team using the form below.</p>
+        </div>
+
+        <form class="contact-form" id="contactForm">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" autocomplete="name" required>
+
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" autocomplete="email" required>
+
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" required>
+
+          <label for="message">Your Message</label>
+          <textarea id="message" name="message" required></textarea>
+
+          <button type="submit">Send Message</button>
+          <p class="form-note" id="formNote" role="status">The contact form is a frontend preview. Message delivery will be enabled when the website backend is connected.</p>
+        </form>
+
+        <p class="contact-intro" style="margin-top:30px;">Thank you for visiting Petros Curious Mind. Your interest and support help us keep the spirit of storytelling alive.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><strong>Petros Curious Mind</strong> — The Story Behind Every Story.</p>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms</a>
+        <a href="signin.html">Sign In</a>
+      </div>
+      <p>© <span id="currentYear"></span> Petros Curious Mind. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    document.getElementById("contactForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      document.getElementById("formNote").textContent =
+        "Thanks for your message. The form is not connected to message delivery yet; that will be added with the backend.";
+    });
+  </script>
+</body>
+</html>
