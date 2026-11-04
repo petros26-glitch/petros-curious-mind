@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Petros Curious Mind Admin Dashboard">
+  <meta name="robots" content="noindex, nofollow">
+
+  <title>Admin Dashboard | Petros Curious Mind</title>
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    .admin-shell {
+      max-width: 1180px;
+      margin: auto;
+      padding: 35px 20px 70px;
+    }
+
+    .admin-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .admin-kicker {
+      color: #0878e8;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .admin-title {
+      font: 800 clamp(27px, 4vw, 38px)/1.2 Manrope, sans-serif;
+      color: #14243a;
+      margin: 5px 0;
+    }
+
+    .admin-subtitle {
+      color: #64748b;
+    }
+
+    .admin-status {
+      padding: 9px 13px;
+      border: 1px solid #f1d9a7;
+      border-radius: 30px;
+      background: #fff9eb;
+      color: #8a5a0a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 235px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .admin-sidebar,
+    .admin-panel,
+    .admin-stat {
+      background: white;
+      border: 1px solid #e2eaf3;
+      border-radius: 16px;
+      box-shadow: 0 8px 28px rgba(10,45,90,.05);
+    }
+
+    .admin-sidebar {
+      padding: 14px;
+      position: sticky;
+      top: 95px;
+    }
+
+    .admin-nav {
+      display: grid;
+      gap: 5px;
+    }
+
+    .admin-nav button {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      padding: 12px;
+      border-radius: 10px;
+      color: #52647a;
+      font: 600 14px 'DM Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    .admin-nav button:hover,
+    .admin-nav button.active {
+      background: #eaf4ff;
+      color: #0758ad;
+    }
+
+    .admin-nav button span {
+      display: inline-block;
+      width: 27px;
+    }
+
+    .admin-sidebar-note {
+      margin-top: 18px;
+      padding: 13px;
+      border-radius: 11px;
+      background: #f6f9fd;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .admin-main {
+      min-width: 0;
+    }
+
+    .admin-panel {
+      padding: 23px;
+      margin-bottom: 18px;
+    }
+
+    .panel-heading {
+      margin-bottom: 18px;
+    }
+
+    .panel-heading h2 {
+      font: 800 20px Manrope, sans-serif;
+      color: #14243a;
+      margin-bottom: 5px;
+    }
+
+    .panel-heading p {
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 13px;
+    }
+
+    .admin-stat {
+      padding: 18px;
+      box-shadow: none;
+    }
+
+    .admin-stat h3 {
+      font: 700 15px Manrope, sans-serif;
+      margin: 10px 0 5px;
+      color: #14243a;
+    }
+
+    .admin-stat p {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .awaiting {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 5px 8px;
+      border-radius: 7px;
+      background: #fff7e8;
+      color: #94620e;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .admin-notice {
+      padding: 15px 17px;
+      border: 1px solid #cfe3fa;
+      border-radius: 12px;
+      background: #f3f9ff;
+      color: #34536f;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .admin-notice strong {
+      color: #174b7e;
+    }
+
+    .admin-checklist {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .admin-checklist li {
+      display: flex;
+      gap: 11px;
+      color: #52647a;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .check-mark {
+      flex: 0 0 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #eaf4ff;
+      color: #0878e8;
+      font-weight: 800;
+    }
+
+    .admin-back {
+      color: #0878e8;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .admin-footer {
+      text-align: center;
+      color: #8391a2;
+      font-size: 12px;
+      padding-top: 15px;
+    }
+
+    .admin-view[hidden] {
+      display: none;
+    }
+
+    @media(max-width:760px) {
+      .admin-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-sidebar {
+        position: static;
+      }
+
+      .admin-nav {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .admin-nav button {
+        font-size: 12px;
+        padding: 10px 7px;
+      }
+
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .admin-panel {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+
+    <a class="brand" href="index.html">
+      <span class="brand-mark">P</span>
+      <span>Petros Curious Mind</span>
+    </a>
+
+    <a class="admin-back" href="index.html">
+      ← Back to website
+    </a>
+
+  </header>
+
+
+  <main class="admin-shell">
+
+    <div class="admin-top">
+
+      <div>
+        <p class="admin-kicker">PRIVATE WORKSPACE</p>
+
+        <h1 class="admin-title">
+          Admin Dashboard
+        </h1>
+
+        <p class="admin-subtitle">
+          Manage and monitor Petros Curious Mind.
+        </p>
+      </div>
+
+      <span class="admin-status">
+        Backend connection pending
+      </span>
+
+    </div>
+
+
+    <div class="admin-layout">
+
+      <!-- SIDEBAR -->
+
+      <aside class="admin-sidebar">
+
+        <nav class="admin-nav">
+
+          <button class="active" data-view="overview">
+            <span>▦</span> Overview
+          </button>
+
+          <button data-view="stories">
+            <span>▤</span> Stories
+          </button>
+
+          <button data-view="users">
+            <span>♙</span> Users
+          </button>
+
+          <button data-view="comments">
+            <span>☰</span> Comments
+          </button>
+
+          <button data-view="health">
+            <span>♡</span> Website Health
+          </button>
+
+          <button data-view="progress">
+            <span>✓</span> Progress Tracker
+          </button>
+
+        </nav>
+
+        <div class="admin-sidebar-note">
+          This is the dashboard interface.
+          Secure authentication and live management
+          will be connected when the backend is ready.
+        </div>
+
+      </aside>
+
+
+      <!-- MAIN CONTENT -->
+
+      <div class="admin-main">
+
+
+        <!-- OVERVIEW -->
+
+        <section class="admin-view" id="view-overview">
+
+          <div class="admin-panel">
+
+            <div class="panel-heading">
+
+              <h2>Welcome to your workspace</h2>
+
+              <p>
+                Your admin control centre is taking shape.
+              </p>
+
+            </div>
+
+            <div class="admin-notice">
+
+              <strong>Setup mode:</strong>
+
+              This dashboard is not connected to the database yet.
+              It does not read, create, edit or delete production data.
+              No statistics are fabricated.
+
+            </div>
+
+          </div>
+
+
+          <div class="admin-grid">
+
+            <article class="admin-stat">
+
+              <div>📚</div>
+
+              <h3>Story Management</h3>
+
+              <p>
+                Create, edit, publish and organise stories.
+              </p>
+
+              <span class="awaiting">
+                Awaiting backend
+              </span>
+
+            </article>
+
+
+            <article class="admin-stat">
+
+              <div>👥</div>
+
+              <h3>User Management</h3>
+
+              <p>
+                Review registered accounts and account status.
+              </p>
+
+              <span class="awaiting">
+                Awaiting backend
+              </span>
+
+            </article>
+
+
+            <article class="admin-stat">
+
+              <div>💬</div>
+
+              <h3>Comment Moderation</h3>
+
+              <p>
+                Review and moderate community comments.
+              </p>
+
+              <span class="awaiting">
+                Awaiting backend
+              </span>
+
+            </article>
+
+          </div>
+
+        </section>
+
+
+        <!-- STORIES -->
+
+        <section class="admin-view" id="view-stories" hidden>
+
+          <div class="admin-panel">
+
+            <div class="panel-heading">
+
+              <h2>Story Management</h2>
+
+              <p>
+                Manage drafts and published stories.
+              </p>
+
+            </div>
+
+            <div class="admin-notice">
+
+              Story lists, editing, publishing and deletion
+              controls will become available when the
+              authenticated backend API is connected.
+
+              Nothing on this page currently changes a story.
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- USERS -->
+
+        <section class="admin-view" id="view-users" hidden>
+
+          <div class="admin-panel">
+
+            <div class="panel-heading">
+
+              <h2>User Management</h2>
+
+              <p>
+                Account administration and access review.
+              </p>
+
+            </div>
+
+            <div class="admin-notice">
+
+              User records and account actions require
+              verified admin authentication and backend
+              permissions.
+
+              No user data is loaded or exposed here.
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- COMMENTS -->
+
+        <section class="admin-view" id="view-comments" hidden>
+
+          <div class="admin-panel">
+
+            <div class="panel-heading">
+
+              <h2>Comment Management</h2>
+
+              <p>
+                Keep the discussion useful and respectful.
+              </p>
+
+            </div>
+
+            <div class="admin-notice">
+
+              Comment queues, moderation actions and reporting
+              tools will be connected to the backend later.
+
+              No comments are currently loaded, hidden or deleted.
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- WEBSITE HEALTH -->
+
+        <section class="admin-view" id="view-health" hidden>
+
+          <div class="admin-panel">
+
+            <div class="panel-heading">
+
+              <h2>Website Health</h2>
+
+              <p>
+                Current implementation readiness.
+              </p>
+
+            </div>
+
+            <ul class="admin-checklist">
+
+              <li>
+                <span class="check-mark">✓</span>
+                <span>
+                  <strong>Dashboard interface created</strong><br>
+                  Standalone admin page.
+                  Existing public pages are untouched.
+                </span>
+              </li>
+
+              <li>
+                <span class="check-mark">✓</span>
+                <span>
+                  <strong>Mobile-friendly layout</strong><br>
+                  Navigation and panels adapt to smaller screens.
+                </span>
+              </li>
+
+              <li>
+                <span class="check-mark">…</span>
+                <span>
+                  <strong>Backend/API connection</strong><br>
+                  Waiting for your brother's backend details.
+                </span>
+              </li>
+
+              <li>
+                <span class="check-mark">…</span>
+                <span>
+                  <strong>Admin authentication</strong><br>
+                  Must be implemented before enabling management.
+                </span>
+              </li>
+
+            </ul>
+
+          </div>
+
+        </section>
+
+
+        <!-- PROGRESS -->
+
+        <section class="admin-view" id="view-progress" hidden>
+
+          <div class="admin-panel">
+
+            <div class="panel-heading">
+
+              <h2>Project Progress</h2>
+
+              <p>
+                Dashboard development checklist.
+              </p>
+
+            </div>
+
+            <ul class="admin-checklist">
+
+              <li>
+                <span class="check-mark">✓</span>
+                <span>Dashboard page structure and visual design.</span>
+              </li>
+
+              <li>
+                <span class="check-mark">✓</span>
+                <span>Overview and navigation sections.</span>
+              </li>
+
+              <li>
+                <span class="check-mark">✓</span>
+                <span>No fake analytics or sample records.</span>
+              </li>
+
+              <li>
+                <span class="check-mark">…</span>
+                <span>Connect secure admin authentication.</span>
+              </li>
+
+              <li>
+                <span class="check-mark">…</span>
+                <span>Connect stories, users and comments to the API.</span>
+              </li>
+
+              <li>
+                <span class="check-mark">…</span>
+                <span>Add real analytics when reliable data is available.</span>
+              </li>
+
+            </ul>
+
+          </div>
+
+        </section>
+
+
+        <p class="admin-footer">
+
+          © <span id="adminYear"></span>
+          Petros Curious Mind · Admin Interface Preview
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <script>
+
+    // Dashboard navigation.
+    // This script only switches between local sections.
+    // It does not access the database.
+
+    const navButtons =
+      document.querySelectorAll(".admin-nav button");
+
+    const views =
+      document.querySelectorAll(".admin-view");
+
+    navButtons.forEach((button) => {
+
+      button.addEventListener("click", () => {
+
+        const target = button.dataset.view;
+
+        navButtons.forEach((item) => {
+
+          item.classList.toggle(
+            "active",
+            item === button
+          );
+
+        });
+
+        views.forEach((view) => {
+
+          view.hidden =
+            view.id !== `view-${target}`;
+
+        });
+
+      });
+
+    });
+
+
+    document.getElementById("adminYear").textContent =
+      new Date().getFullYear();
+
+  </script>
+
+</body>
+</html>
