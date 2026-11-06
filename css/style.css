@@ -1771,3 +1771,70 @@ button:focus-visible {
   .auth-form-panel { padding:31px 22px; }
   .auth-form-heading h2 { font-size:27px; }
 }
+
+
+/* BLUE GLASS PANELS — ABOUT, CONTACT AND SIGN IN */
+.about-lead {
+  padding: 34px;
+  border: 1px solid rgba(8,120,232,.12);
+  border-radius: 18px;
+  background: linear-gradient(145deg,#edf6ff 0%,#dceeff 100%);
+  box-shadow: 0 14px 34px rgba(7,88,173,.09);
+}
+.about-story-panel {
+  border: 1px solid rgba(8,120,232,.14);
+  border-radius: 16px;
+  background: linear-gradient(145deg,#f7fbff 0%,#eaf4ff 100%);
+  box-shadow: 0 10px 26px rgba(7,88,173,.07);
+}
+.about-story-panel h3 { color:#0758ad; }
+.about-ending {
+  background:linear-gradient(125deg,#eaf4ff 0%,#d8ebff 100%);
+}
+.contact-aside {
+  padding: 34px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 18px;
+  background: linear-gradient(145deg,#0758ad 0%,#0878e8 68%,#3197ef 100%);
+  box-shadow: 0 16px 38px rgba(7,88,173,.2);
+  color:#fff;
+}
+.contact-aside .eyebrow,
+.contact-aside h2,
+.contact-aside > p:not(.eyebrow),
+.contact-aside .contact-small-title,
+.contact-aside .contact-small-copy { color:#fff; }
+.contact-aside .eyebrow { color:#c9e5ff; }
+.contact-aside-rule { background:#b9ddff; }
+.contact-form-card {
+  border:1px solid rgba(8,120,232,.16);
+  border-radius:18px;
+  background:linear-gradient(145deg,#fafdff 0%,#edf6ff 100%);
+  box-shadow:0 16px 40px rgba(7,88,173,.1);
+}
+.auth-brand-panel {
+  background:linear-gradient(145deg,#064b91 0%,#075fb9 48%,#0878e8 100%);
+}
+.auth-brand-panel::before {
+  content:"";
+  position:absolute;
+  inset:22px;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:17px;
+  background:rgba(255,255,255,.075);
+  pointer-events:none;
+}
+.auth-brand-panel > * { position:relative; z-index:1; }
+.auth-brand-panel .eyebrow { color:#d4eaff; }
+.auth-form-panel {
+  background:linear-gradient(145deg,#ffffff 0%,#f1f7ff 100%);
+}
+@media(max-width:760px) {
+  .about-lead { padding:27px 23px; }
+  .contact-aside { padding:27px 23px; }
+  .auth-brand-panel::before { inset:14px; }
+}
+@media(max-width:480px) {
+  .about-lead { padding:23px 19px; }
+  .contact-aside { padding:23px 19px; }
+}
