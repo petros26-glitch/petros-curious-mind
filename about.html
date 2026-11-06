@@ -3,168 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <meta name="description" content="Learn about Petros Curious Mind, our purpose, vision and love for folklore and storytelling.">
-
-  <title>About Us | Petros Curious Mind</title>
-
+  <title>About | Petros Curious Mind</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-
-  <!-- NAVIGATION -->
-  <header>
-    <nav class="navbar">
-
-      <a class="logo" href="index.html">
-        Petros Curious Mind
-      </a>
-
-      <button
-        class="menu-toggle"
-        type="button"
-        aria-label="Toggle navigation"
-        aria-expanded="false">
-        ☰
-      </button>
-
-      <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="stories.html">Stories</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="signin.html">Sign In</a></li>
-      </ul>
-
+  <header class="site-header">
+    <a class="brand" href="index.html"><img src="images/logo.png" alt="Petros Curious Mind logo" class="brand-logo">Petros Curious Mind</a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">☰</button>
+    <nav class="navigation" id="navigation" aria-label="Main navigation">
+      <a href="index.html">Home</a><a href="stories.html">Stories</a><a href="about.html" aria-current="page">About</a><a href="contact.html">Contact</a><a href="signin.html" class="nav-signin">Sign In</a>
     </nav>
   </header>
-
-
-  <!-- ABOUT PAGE -->
-  <main class="page-container">
-
-    <section class="page-header">
-
-      <h1>About Petros Curious Mind</h1>
-
-      <p>
-        The Story Behind Every Story.
-      </p>
-
+  <main>
+    <section class="page-intro">
+      <div class="section-wrap">
+        <p class="eyebrow">Get to know us</p>
+        <h1>About Petros Curious Mind</h1>
+        <p>The Story Behind Every Story.</p>
+      </div>
     </section>
-
-
-    <section class="content-section">
-
-      <!-- ABOUT US -->
+    <section class="section-wrap about-content">
       <div class="about-section">
-
         <h2>About Us</h2>
-
-        <p>
-          Petros Curious Mind is a storytelling platform dedicated
-          to folklore and the stories that have been shared across
-          generations.
-        </p>
-
-        <p>
-          We believe stories are more than words. They carry history,
-          imagination, wisdom, culture and lessons that connect
-          people across different generations.
-        </p>
-
+        <p>Petros Curious Mind is a storytelling platform dedicated to folklore and the stories that have been shared across generations.</p>
+        <p>We believe stories are more than words. They carry history, imagination, wisdom, culture and lessons that connect people across different generations.</p>
       </div>
-
-
-      <!-- OUR PURPOSE -->
       <div class="about-section">
-
         <h2>Our Purpose</h2>
-
-        <p>
-          Our purpose is to create a place where readers can discover,
-          explore and enjoy folklore from different backgrounds and
-          traditions.
-        </p>
-
-        <p>
-          We want to make storytelling accessible to curious minds
-          and help preserve the value of traditional stories.
-        </p>
-
+        <p>Our purpose is to create a place where readers can discover, explore and enjoy folklore from different backgrounds and traditions.</p>
+        <p>We want to make storytelling accessible to curious minds and help preserve the value of traditional stories.</p>
       </div>
-
-
-      <!-- OUR VISION -->
       <div class="about-section">
-
         <h2>Our Vision</h2>
-
-        <p>
-          We envision a world where stories continue to inspire,
-          educate and connect people.
-        </p>
-
-        <p>
-          Through Petros Curious Mind, we hope to build a growing
-          storytelling community that appreciates the beauty and
-          importance of folklore.
-        </p>
-
+        <p>We envision a world where stories continue to inspire, educate and connect people.</p>
+        <p>Through Petros Curious Mind, we hope to build a growing storytelling community that appreciates the beauty and importance of folklore.</p>
       </div>
-
-
-      <!-- OUR STORY -->
       <div class="about-section">
-
         <h2>Our Story</h2>
-
-        <p>
-          Every story has a beginning, and every tradition has
-          something worth discovering.
-        </p>
-
-        <p>
-          Petros Curious Mind was created from a curiosity about
-          the stories behind cultures, traditions and the world
-          around us.
-        </p>
-
-        <p>
-          Our journey is about keeping the spirit of storytelling
-          alive, one story at a time.
-        </p>
-
+        <p>Every story has a beginning, and every tradition has something worth discovering.</p>
+        <p>Petros Curious Mind was created from a curiosity about the stories behind cultures, traditions and the world around us.</p>
+        <p>Our journey is about keeping the spirit of storytelling alive, one story at a time.</p>
       </div>
-
     </section>
-
   </main>
-
-
-  <!-- FOOTER -->
   <footer class="site-footer">
-
-    <p>
-      &copy;
-      <span id="current-year"></span>
-      Petros Curious Mind. All rights reserved.
-    </p>
-
-    <div class="footer-links">
-
-      <a href="privacy.html">Privacy Policy</a>
-
-      <a href="terms.html">Terms and Conditions</a>
-
-    </div>
-
+    <p>&copy; <span id="currentYear"></span> Petros Curious Mind. All rights reserved.</p>
+    <div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms and Conditions</a></div>
   </footer>
-
-
-  <!-- JAVASCRIPT -->
   <script src="js/main.js"></script>
-
 </body>
 </html>
