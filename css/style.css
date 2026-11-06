@@ -1528,3 +1528,37 @@ button:focus-visible {
         padding: 20px;
     }
 }
+
+/* =========================================
+   INNER PAGES
+========================================= */
+.page-intro {
+  background: linear-gradient(120deg, #f4f9ff 0%, #eaf4ff 55%, #dceeff 100%);
+  text-align: center;
+}
+.page-intro .section-wrap { padding-top: 65px; padding-bottom: 65px; }
+.page-intro h1 {
+  margin: 0 0 10px;
+  font: 800 clamp(32px, 4vw, 46px)/1.2 Manrope, sans-serif;
+  letter-spacing: -1.2px;
+}
+.page-intro > .section-wrap > p:last-child { color: #64748b; }
+.about-content { max-width: 900px; }
+.about-section {
+  padding: 28px 30px;
+  margin-bottom: 20px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 8px 25px rgba(18,66,112,.06);
+}
+.about-section h2 { margin-bottom: 10px; font: 700 22px Manrope, sans-serif; }
+.about-section p { color: var(--muted); line-height: 1.85; margin-top: 8px; }
+.footer-links { display:flex; flex-wrap:wrap; justify-content:center; gap:18px; margin:12px 0; }
+.footer-links a { color:#d8e3ef; font-size:13px; }
+.footer-links a:hover { color:#fff; }
+.site-footer > p { text-align:center; color:#d8e3ef; }
+@media(max-width:560px) {
+  .page-intro .section-wrap { padding-top:48px; padding-bottom:48px; }
+  .about-section { padding:22px 19px; }
+}
