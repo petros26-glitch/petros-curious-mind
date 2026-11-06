@@ -1,993 +1,249 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-
-/* =====================================
-   1. GLOBAL SETTINGS
-===================================== */
-
-:root {
-    --blue: #0878e8;
-    --blue-dark: #0758ad;
-    --ink: #14243a;
-    --muted: #64748b;
-    --pale: #eef6ff;
-    --line: #e2eaf3;
-    --white: #ffffff;
-    --shadow: 0 18px 55px rgba(18,66,112,.10);
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html {
-    scroll-behavior: smooth;
-    width: 100%;
-    overflow-x: hidden;
-}
-
-body {
-    width: 100%;
-    min-width: 320px;
-    overflow-x: hidden;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--ink);
-    background: #ffffff;
-    line-height: 1.65;
-}
-
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-img,
-video {
-    max-width: 100%;
-    height: auto;
-}
-
-button,
-input,
-textarea,
-select {
-    font: inherit;
-}
-
-
-/* =====================================
-   2. HEADER AND NAVIGATION
-===================================== */
-
-.site-header {
-    min-height: 78px;
-    padding: 0 max(5.5%, calc((100% - 1160px) / 2));
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    background: #ffffff;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid rgba(226,234,243,.8);
-    transition: box-shadow .2s;
-}
-
-.site-header.header-scrolled {
-    box-shadow: 0 8px 28px rgba(20,36,58,.08);
-}
-
-.brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 11px;
-    font-family: Manrope, sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    flex-shrink: 0;
-}
-
-.brand-mark {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    background: var(--blue);
-    color: white;
-    border-radius: 11px;
-    font-size: 20px;
-}
-
-.navigation {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.navigation a:hover,
-.text-link:hover,
-.story-card a:hover {
-    color: var(--blue);
-}
-
-.navigation .nav-signin {
-    background: var(--blue);
-    color: white;
-    padding: 10px 19px;
-    border-radius: 9px;
-}
-
-.menu-toggle {
-    display: none;
-    border: 0;
-    background: var(--pale);
-    color: var(--blue-dark);
-    font-size: 25px;
-    padding: 5px 11px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-
-/* =====================================
-   3. HERO SECTION
-===================================== */
-
-.hero-section {
-    min-height: 570px;
-    width: 100%;
-    padding: 85px max(7%, calc((100% - 1120px) / 2));
-    display: grid;
-    grid-template-columns: 1.1fr .9fr;
-    align-items: center;
-    gap: 45px;
-    background: linear-gradient(
-        120deg,
-        #f4f9ff 0%,
-        #eaf4ff 55%,
-        #dceeff 100%
-    );
-    overflow: hidden;
-}
-
-.hero-copy {
-    min-width: 0;
-}
-
-.eyebrow {
-    font-size: 11px;
-    letter-spacing: 2px;
-    font-weight: 800;
-    color: var(--blue);
-    margin-bottom: 13px;
-}
-
-.hero-copy h1 {
-    font: 800 clamp(42px, 5vw, 66px)/1.12 Manrope, sans-serif;
-    letter-spacing: -2.5px;
-    margin-bottom: 14px;
-}
-
-.hero-copy h1 span,
-.section-heading h2 span,
-.mission-section h2 span {
-    color: var(--blue);
-}
-
-.hero-tagline {
-    font-weight: 700;
-    color: var(--blue-dark);
-    margin-bottom: 12px;
-}
-
-.hero-description {
-    max-width: 560px;
-    color: var(--muted);
-    font-size: 16px;
-    line-height: 1.8;
-}
-
-.button-row {
-    display: flex;
-    gap: 13px;
-    flex-wrap: wrap;
-    margin-top: 28px;
-}
-
-.button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 13px 20px;
-    border-radius: 9px;
-    font-size: 14px;
-    font-weight: 700;
-    transition: transform .2s, background .2s;
-    cursor: pointer;
-}
-
-.button:hover {
-    transform: translateY(-2px);
-}
-
-.button-primary {
-    background: var(--blue);
-    color: white;
-    box-shadow: 0 8px 18px rgba(8,120,232,.2);
-}
-
-.button-primary:hover {
-    background: var(--blue-dark);
-}
-
-.button-quiet {
-    color: var(--blue-dark);
-    background: white;
-}
-
-
-/* =====================================
-   4. HERO ARTWORK
-===================================== */
-
-.hero-art {
-    height: 350px;
-    position: relative;
-    display: grid;
-    place-items: center;
-}
-
-.orbit {
-    position: absolute;
-    border: 1px solid rgba(8,120,232,.22);
-    border-radius: 50%;
-    transform: rotate(-25deg);
-}
-
-.orbit-one {
-    width: 340px;
-    height: 230px;
-}
-
-.orbit-two {
-    width: 280px;
-    height: 340px;
-    transform: rotate(55deg);
-}
-
-.art-sun {
-    position: absolute;
-    top: 20px;
-    right: 50px;
-    color: #f2ad39;
-    font-size: 42px;
-}
-
-.art-card {
-    width: 230px;
-    height: 260px;
-    border-radius: 25px;
-    background: linear-gradient(145deg, #0878e8, #064c9a);
-    box-shadow: 0 25px 55px rgba(4,75,150,.28);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transform: rotate(-5deg);
-    position: relative;
-}
-
-.art-card span {
-    font-size: 45px;
-    color: #a9d6ff;
-}
-
-.art-card strong {
-    font: 800 32px/1.05 Manrope, sans-serif;
-    letter-spacing: 3px;
-    text-align: center;
-    margin: 12px;
-}
-
-.art-card small {
-    font-size: 8px;
-    letter-spacing: 2px;
-}
-
-.spark {
-    position: absolute;
-    color: var(--blue);
-    font-size: 35px;
-}
-
-.spark-one {
-    left: 25px;
-    top: 70px;
-}
-
-.spark-two {
-    right: 25px;
-    bottom: 40px;
-}
-
-
-/* =====================================
-   5. GENERAL SECTIONS
-===================================== */
-
-.section-wrap {
-    max-width: 1120px;
-    width: 100%;
-    margin: auto;
-    padding: 90px 25px;
-}
-
-.section-heading {
-    max-width: 720px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.section-heading h2,
-.mission-section h2,
-.latest-heading h2 {
-    font: 800 clamp(30px, 3.5vw, 42px)/1.2 Manrope, sans-serif;
-    letter-spacing: -1.2px;
-    margin-bottom: 16px;
-}
-
-.section-heading > p:not(.eyebrow) {
-    color: var(--muted);
-    margin: 0;
-    line-height: 1.8;
-}
-
-.centered {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.home-intro {
-    max-width: 850px;
-}
-
-
-/* =====================================
-   6. VALUE CARDS
-===================================== */
-
-.value-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-    margin-top: 40px;
-}
-
-.value-card {
-    padding: 28px;
-    border: 1px solid var(--line);
-    border-radius: 15px;
-    box-shadow: var(--shadow);
-    background: white;
-}
-
-.card-icon {
-    display: grid;
-    place-items: center;
-    width: 43px;
-    height: 43px;
-    background: var(--pale);
-    border-radius: 12px;
-    color: var(--blue);
-    font-size: 22px;
-}
-
-.value-card h3,
-.story-card h3 {
-    font: 700 18px Manrope, sans-serif;
-    margin: 18px 0 8px;
-}
-
-.value-card p,
-.story-card p {
-    font-size: 14px;
-    color: var(--muted);
-}
-
-.value-card a,
-.story-card a {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--blue);
-}
-
-
-/* =====================================
-   7. STORIES SECTIONS
-===================================== */
-
-.stories-section {
-    background: #f6f9fd;
-}
-
-.text-link {
-    display: inline-block;
-    color: var(--blue);
-    font-size: 14px;
-    font-weight: 700;
-    margin-top: 13px;
-}
-
-.category-row {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 34px 0;
-}
-
-.category {
-    padding: 8px 16px;
-    border: 1px solid var(--line);
-    border-radius: 30px;
-    color: #52647a;
-    font-size: 12px;
-    font-weight: 700;
-    background: white;
-}
-
-.category.active {
-    background: var(--blue);
-    border-color: var(--blue);
-    color: white;
-}
-
-.featured-story {
-    display: grid;
-    grid-template-columns: .85fr 1.15fr;
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-}
-
-.featured-art {
-    min-height: 300px;
-    background: radial-gradient(circle at 70% 20%, #318fe8, #063d7b 70%);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    letter-spacing: 3px;
-}
-
-.featured-art span {
-    font-size: 12px;
-}
-
-.featured-art strong {
-    font: 800 48px/.95 Manrope, sans-serif;
-    text-align: center;
-    margin: 15px;
-}
-
-.featured-art small {
-    font-size: 9px;
-}
-
-.featured-copy {
-    padding: 40px;
-    min-width: 0;
-}
-
-.featured-copy h3 {
-    font: 800 28px/1.2 Manrope, sans-serif;
-    margin: 10px 0;
-}
-
-.featured-copy > p:not(.eyebrow) {
-    color: var(--muted);
-    font-size: 14px;
-}
-
-.featured-copy > small {
-    display: block;
-    color: #8391a2;
-    margin: 20px 0;
-}
-
-.latest-heading {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 15px;
-    margin: 70px 0 25px;
-}
-
-.latest-heading h2 {
-    margin: 0;
-}
-
-.story-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-}
-
-.story-card {
-    min-width: 0;
-    background: white;
-    padding: 16px 18px 23px;
-    border: 1px solid var(--line);
-    border-radius: 15px;
-}
-
-.story-art {
-    height: 145px;
-    border-radius: 11px;
-    display: grid;
-    place-items: center;
-    font-size: 52px;
-    margin-bottom: 20px;
-}
-
-.art-mystery {
-    background: linear-gradient(135deg, #dcecff, #a8d2ff);
-    color: #1264b8;
-}
-
-.art-folklore {
-    background: linear-gradient(135deg, #fcebd7, #f5c78d);
-    color: #9b5a20;
-}
-
-.art-imagination {
-    background: linear-gradient(135deg, #e9e2ff, #c9b9ff);
-    color: #6543b7;
-}
-
-.story-card .eyebrow {
-    margin-bottom: 5px;
-}
-
-.story-card h3 {
-    margin: 5px 0;
-}
-
-.center-button {
-    text-align: center;
-    margin-top: 35px;
-}
-
-.button-outline {
-    border: 1px solid #b9d8f7;
-    color: var(--blue);
-    background: white;
-}
-
-/* Empty story messages */
-
-.empty-state {
-    grid-column: 1 / -1;
-    width: 100%;
-    margin: 0;
-    padding: 25px 20px;
-    text-align: center;
-    line-height: 1.8;
-    border: 1px dashed rgba(8,120,232,.35);
-    border-radius: 14px;
-    color: #52657a;
-    background: rgba(8,120,232,.035);
-}
-
-
-/* =====================================
-   8. MISSION SECTION
-===================================== */
-
-.mission-section {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    align-items: center;
-    gap: 55px;
-}
-
-.mission-symbol {
-    height: 190px;
-    width: 190px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background: var(--pale);
-    color: var(--blue);
-    font: 800 100px Manrope;
-}
-
-.mission-section p:not(.eyebrow) {
-    color: var(--muted);
-    max-width: 720px;
-}
-
-
-/* =====================================
-   9. CALL TO ACTION
-===================================== */
-
-.closing-cta {
-    text-align: center;
-    padding: 75px 20px;
-    background: linear-gradient(120deg, #0754a5, #0878e8);
-    color: white;
-}
-
-.closing-cta .eyebrow {
-    color: #b9ddff;
-}
-
-.closing-cta h2 {
-    font: 800 clamp(30px, 4vw, 44px) Manrope, sans-serif;
-    margin: 8px 0;
-}
-
-.closing-cta > p:not(.eyebrow) {
-    color: #e0efff;
-}
-
-.button-light {
-    background: white;
-    color: var(--blue-dark);
-    margin-top: 16px;
-}
-
-
-/* =====================================
-   10. FOOTER
-===================================== */
-
-.site-footer {
-    background: #101f33;
-    color: #d8e3ef;
-    padding: 55px max(6%, calc((100% - 1120px) / 2)) 20px;
-}
-
-.footer-main {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 45px;
-    padding-bottom: 40px;
-}
-
-.footer-brand {
-    min-width: 0;
-}
-
-.site-footer .brand {
-    color: white;
-}
-
-.footer-brand > p {
-    max-width: 340px;
-    color: #aab9ca;
-    font-size: 13px;
-    margin-top: 10px;
-}
-
-.footer-brand .footer-tagline {
-    color: #fff;
-    font-weight: 700;
-}
-
-.footer-main h3 {
-    font: 700 14px Manrope, sans-serif;
-    color: white;
-    margin: 5px 0 15px;
-}
-
-.footer-main > div:not(:first-child) a {
-    display: block;
-    color: #aab9ca;
-    font-size: 13px;
-    margin: 9px 0;
-}
-
-.footer-main a:hover,
-.footer-bottom a:hover {
-    color: white;
-}
-
-.footer-bottom {
-    border-top: 1px solid #2b3b50;
-    padding-top: 18px;
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    color: #9eafc1;
-    font-size: 12px;
-}
-
-.footer-bottom a {
-    color: #d8e3ef;
-}
-
-
-/* =====================================
-   11. TABLETS AND SMALL LAPTOPS
-===================================== */
-
-@media (max-width: 800px) {
-
-    .site-header {
-        height: 68px;
-        min-height: 68px;
-        padding: 0 5%;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create your Petros Curious Mind account and explore the stories behind every story.">
+  <title>Sign Up | Petros Curious Mind</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-section {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 55px 20px 70px;
     }
-
-    .menu-toggle {
-        display: block;
+    .auth-container {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      box-sizing: border-box;
     }
-
-    .navigation {
-        display: none;
-        position: absolute;
-        top: 68px;
-        left: 0;
-        right: 0;
-        padding: 18px 5% 22px;
-        background: white;
-        border-bottom: 1px solid var(--line);
-        box-shadow: 0 15px 20px rgba(20,36,58,.08);
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0;
+    .auth-header {
+      text-align: center;
+      margin-bottom: 30px;
     }
-
-    .navigation.is-open {
-        display: flex;
+    .auth-header h1 { margin-bottom: 12px; }
+    .auth-header p { line-height: 1.7; }
+    .auth-card {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 30px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 28px rgba(10,45,90,.09);
     }
-
-    .navigation a {
-        padding: 12px 5px;
+    .auth-card label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
     }
-
-    .navigation .nav-signin {
-        text-align: center;
-        margin-top: 8px;
+    .auth-card input[type="text"],
+    .auth-card input[type="email"],
+    .auth-card input[type="password"] {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      margin: 0 0 20px;
+      border: 1px solid #ccd7e5;
+      border-radius: 10px;
+      font: inherit;
+      background: #fff;
     }
-
-    .hero-section {
-        grid-template-columns: 1fr;
-        padding: 65px 7% 35px;
-        gap: 10px;
+    .auth-card input:focus {
+      outline: 3px solid rgba(8,120,232,.16);
+      border-color: #0878e8;
     }
-
-    .hero-art {
-        height: 300px;
+    .password-option {
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      margin: -5px 0 20px !important;
+      font-weight: 400 !important;
+      font-size: .92rem;
     }
-
-    .value-grid,
-    .story-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .password-option input { margin: 0; }
+    .auth-button {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border: 0;
+      border-radius: 999px;
+      background: #0878e8;
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
     }
-
-    .featured-story {
-        grid-template-columns: 1fr;
+    .auth-button:hover { background: #0758ad; }
+    .auth-switch {
+      text-align: center;
+      margin-top: 24px;
+      line-height: 1.7;
     }
-
-    .featured-art {
-        min-height: 230px;
+    .auth-message {
+      margin-top: 15px;
+      text-align: center;
+      line-height: 1.6;
     }
-
-    .mission-section {
-        grid-template-columns: 130px 1fr;
-        gap: 25px;
+    .auth-legal {
+      margin-top: 18px;
+      color: #64748b;
+      font-size: .86rem;
+      line-height: 1.6;
+      text-align: center;
     }
-
-    .mission-symbol {
-        height: 125px;
-        width: 125px;
-        font-size: 70px;
+    @media (max-width: 480px) {
+      .auth-section { padding: 35px 16px 50px; }
+      .auth-card { padding: 22px 18px; }
     }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="images/logo.png" alt="Petros Curious Mind logo" class="brand-logo">
+      <span>Petros Curious Mind</span>
+    </a>
 
-    .footer-main {
-        grid-template-columns: 1fr 1fr;
-    }
+    <button
+      class="menu-toggle"
+      id="menuToggle"
+      type="button"
+      aria-label="Open navigation"
+      aria-expanded="false"
+      aria-controls="navigation">
+      ☰
+    </button>
 
-    .footer-brand {
-        grid-column: 1 / -1;
-    }
+    <nav class="navigation" id="navigation" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="stories.html">Stories</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="signin.html" class="nav-signin">Sign In</a>
+    </nav>
+  </header>
 
-}
+  <main>
+    <section class="auth-section">
+      <div class="auth-container">
+        <div class="auth-header">
+          <h1>Create Your Account</h1>
+          <p>Join Petros Curious Mind and explore the stories behind every story.</p>
+        </div>
 
+        <form class="auth-card" id="signupForm">
+          <label for="fullName">Full Name</label>
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            autocomplete="name"
+            placeholder="Enter your full name"
+            required>
 
-/* =====================================
-   12. MOBILE PHONES
-===================================== */
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            autocomplete="email"
+            placeholder="Enter your email"
+            required>
 
-@media (max-width: 560px) {
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            autocomplete="new-password"
+            minlength="8"
+            placeholder="Create a password (at least 8 characters)"
+            required>
 
-    .brand {
-        font-size: 14px;
-    }
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            autocomplete="new-password"
+            minlength="8"
+            placeholder="Enter your password again"
+            required>
 
-    .hero-copy h1 {
-        font-size: clamp(34px, 9vw, 43px);
-        line-height: 1.15;
-        letter-spacing: -1.5px;
-    }
+          <label class="password-option" for="showPasswords">
+            <input type="checkbox" id="showPasswords">
+            Show passwords
+          </label>
 
-    .hero-section {
-        padding: 50px 22px 30px;
-    }
+          <button type="submit" class="auth-button">Create Account</button>
 
-    .hero-description {
-        font-size: 15px;
-        line-height: 1.75;
-    }
+          <p class="auth-message" id="signupMessage" role="status" aria-live="polite">
+            Account creation will be connected when the backend is ready.
+          </p>
 
-    .hero-art {
-        height: 270px;
-    }
+          <p class="auth-switch">
+            Already have an account?
+            <a href="signin.html">Sign in</a>
+          </p>
 
-    .orbit-one {
-        width: 290px;
-    }
+          <p class="auth-legal">
+            By creating an account, you agree to our
+            <a href="terms.html">Terms and Conditions</a> and
+            <a href="privacy.html">Privacy Policy</a>.
+          </p>
+        </form>
+      </div>
+    </section>
+  </main>
 
-    .orbit-two {
-        height: 290px;
-    }
+  <footer class="site-footer">
+    <p>
+      &copy; <span id="currentYear"></span>
+      Petros Curious Mind. All rights reserved.
+    </p>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms and Conditions</a>
+    </div>
+  </footer>
 
-    .art-card {
-        width: 195px;
-        height: 220px;
-    }
+  <script src="js/main.js"></script>
+  <script>
+    const showPasswords = document.getElementById("showPasswords");
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const signupForm = document.getElementById("signupForm");
+    const signupMessage = document.getElementById("signupMessage");
 
-    .section-wrap {
-        padding: 60px 20px;
-    }
+    showPasswords.addEventListener("change", () => {
+      const type = showPasswords.checked ? "text" : "password";
+      password.type = type;
+      confirmPassword.type = type;
+    });
 
-    .section-heading h2,
-    .mission-section h2 {
-        font-size: 29px;
-    }
+    signupForm.addEventListener("submit", (event) => {
+      event.preventDefault();
 
-    .section-heading > p:not(.eyebrow) {
-        font-size: 14px;
-    }
+      if (password.value !== confirmPassword.value) {
+        signupMessage.textContent = "Your passwords do not match. Please check and try again.";
+        confirmPassword.setCustomValidity("Passwords do not match.");
+        confirmPassword.reportValidity();
+        return;
+      }
 
-    .value-grid,
-    .story-grid {
-        grid-template-columns: 1fr;
-    }
+      confirmPassword.setCustomValidity("");
+      signupMessage.textContent =
+        "Your details are ready. Account creation will be enabled when the backend is connected.";
+    });
 
-    .value-card {
-        padding: 23px;
-    }
+    confirmPassword.addEventListener("input", () => {
+      confirmPassword.setCustomValidity("");
+    });
 
-    .featured-copy {
-        padding: 27px 23px;
-    }
-
-    .featured-copy h3 {
-        font-size: 24px;
-    }
-
-    .latest-heading {
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .mission-section {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .mission-symbol {
-        height: 90px;
-        width: 90px;
-        font-size: 52px;
-    }
-
-    .footer-main {
-        grid-template-columns: 1fr;
-        gap: 25px;
-    }
-
-    .footer-brand {
-        grid-column: auto;
-    }
-
-    .footer-bottom {
-        flex-direction: column;
-    }
-
-    .button-row {
-        gap: 9px;
-    }
-
-    .button {
-        padding: 12px 15px;
-        font-size: 13px;
-    }
-
-}
-
-
-/* =====================================
-   13. VERY SMALL PHONES
-===================================== */
-
-@media (max-width: 360px) {
-
-    .site-header {
-        padding: 0 13px;
-    }
-
-    .brand {
-        font-size: 12px;
-        gap: 7px;
-    }
-
-    .hero-section {
-        padding-left: 17px;
-        padding-right: 17px;
-    }
-
-    .hero-copy h1 {
-        font-size: 32px;
-    }
-
-    .section-wrap {
-        padding-left: 16px;
-        padding-right: 16px;
-    }
-
-    .button {
-        padding: 11px 13px;
-        font-size: 12px;
-    }
-
-}
-
-
-/* =====================================
-   14. LARGE DESKTOP SCREENS
-===================================== */
-
-@media (min-width: 1200px) {
-
-    .hero-section {
-        padding-left: max(7%, calc((100% - 1120px) / 2));
-        padding-right: max(7%, calc((100% - 1120px) / 2));
-    }
-
-}
-
-
-/* =====================================
-   15. ACCESSIBILITY
-===================================== */
-
-@media (prefers-reduced-motion: reduce) {
-
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-    }
-
-}
+    const year = document.getElementById("currentYear");
+    if (year) year.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
