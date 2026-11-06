@@ -52,7 +52,7 @@
           <label for="message">Your Message</label>
           <textarea id="message" name="message" required></textarea>
           <button type="submit">Send Message</button>
-          <p class="form-note" id="formNote" role="status" aria-live="polite">This form is a frontend preview. Message delivery will be enabled when the website backend is connected.</p>
+          <p class="form-note" id="formNote" role="status" aria-live="polite">Preview only: this form does not send messages yet. Please do not enter sensitive or confidential information.</p>
         </form>
       </div>
     </section>
@@ -65,7 +65,7 @@
   <script>
     document.getElementById("contactForm").addEventListener("submit", function (event) {
       event.preventDefault();
-      document.getElementById("formNote").textContent = "Thanks for preparing your message. Delivery is not connected yet; that will be added with the backend.";
+      document.getElementById("formNote").textContent = "Your message has not been sent. Message delivery will be enabled after the website backend is connected.";
     });
   </script>
 </body>
