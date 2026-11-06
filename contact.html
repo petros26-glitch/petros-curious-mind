@@ -3,69 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Contact Petros Curious Mind with your questions or feedback.">
+  <meta name="description" content="Get in touch with Petros Curious Mind.">
   <title>Contact | Petros Curious Mind</title>
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    .contact-wrap { max-width:760px; margin:0 auto; }
-    .contact-intro { text-align:center; margin:0 auto 32px; max-width:720px; }
-    .contact-intro p { line-height:1.8; color:#64748b; }
-    .contact-form { background:#fff; padding:28px; border:1px solid #e2eaf3; border-radius:18px; box-shadow:0 8px 28px rgba(10,45,90,.09); }
-    .contact-form label { display:block; margin:0 0 8px; font-weight:700; }
-    .contact-form input, .contact-form textarea { display:block; width:100%; box-sizing:border-box; margin:0 0 20px; padding:13px 14px; border:1px solid #ccd7e5; border-radius:10px; font:inherit; background:#fff; }
-    .contact-form textarea { min-height:160px; resize:vertical; }
-    .contact-form button { border:0; border-radius:999px; padding:13px 24px; background:#0878e8; color:#fff; font:inherit; font-weight:700; cursor:pointer; }
-    .contact-form button:hover { background:#0758ad; }
-    .form-note { margin-top:16px; color:#5d6b7c; font-size:.92rem; line-height:1.6; }
-    @media(max-width:600px) { .contact-form { padding:20px; } }
-  </style>
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="index.html"><img src="images/logo.png" alt="Petros Curious Mind logo" class="brand-logo">Petros Curious Mind</a>
+    <a class="brand" href="index.html"><img src="images/logo.png" alt="Petros Curious Mind logo" class="brand-logo"><span>Petros Curious Mind</span></a>
     <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">☰</button>
     <nav class="navigation" id="navigation" aria-label="Main navigation">
       <a href="index.html">Home</a><a href="stories.html">Stories</a><a href="about.html">About</a><a href="contact.html" aria-current="page">Contact</a><a href="signin.html" class="nav-signin">Sign In</a>
     </nav>
   </header>
-  <main>
-    <section class="page-intro">
-      <div class="section-wrap">
-        <p class="eyebrow">Get in touch</p>
-        <h1>Contact Us</h1>
-        <p>We'd love to hear from you.</p>
-      </div>
+  <main class="inner-page">
+    <section class="inner-hero contact-hero">
+      <div class="inner-hero-content"><p class="eyebrow">We are listening</p><h1>Let's start a conversation.</h1><p>Questions, feedback or a note about the site? Send a message using the form.</p></div>
     </section>
-    <section class="section-wrap">
-      <div class="contact-wrap">
-        <div class="contact-intro">
-          <h2>Send Us a Message</h2>
-          <p>Whether you have a question, feedback, or simply want to reach out, we'd be happy to hear from you.</p>
-        </div>
-        <form class="contact-form" id="contactForm">
-          <label for="fullName">Full Name</label>
-          <input type="text" id="fullName" name="fullName" autocomplete="name" required>
-          <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" autocomplete="email" required>
-          <label for="subject">Subject</label>
-          <input type="text" id="subject" name="subject" required>
-          <label for="message">Your Message</label>
-          <textarea id="message" name="message" required></textarea>
-          <button type="submit">Send Message</button>
-          <p class="form-note" id="formNote" role="status" aria-live="polite">Preview only: this form does not send messages yet. Please do not enter sensitive or confidential information.</p>
-        </form>
-      </div>
+    <section class="contact-layout section-wrap">
+      <aside class="contact-aside">
+        <p class="eyebrow">Get in touch</p><h2>We'd be glad to hear from you.</h2>
+        <p>Use this space to share a question or feedback about Petros Curious Mind. A clear subject and message will help us understand what you need.</p>
+        <div class="contact-aside-rule"></div>
+        <p class="contact-small-title">A quick note</p><p class="contact-small-copy">The contact form is currently a preview. Messages are not delivered or stored yet.</p>
+      </aside>
+      <form class="contact-form-card" id="contactForm">
+        <div class="form-card-heading"><span>01 / MESSAGE</span><h2>Send us a message</h2><p>Complete the fields below.</p></div>
+        <div class="form-field"><label for="fullName">Full name</label><input type="text" id="fullName" name="fullName" autocomplete="name" placeholder="Your name" required></div>
+        <div class="form-field"><label for="email">Email address</label><input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required></div>
+        <div class="form-field"><label for="subject">Subject</label><input type="text" id="subject" name="subject" placeholder="What is this about?" required></div>
+        <div class="form-field"><label for="message">Your message</label><textarea id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea></div>
+        <button type="submit" class="button button-primary contact-submit">Send Message <span aria-hidden="true">→</span></button>
+        <p class="form-note" id="formNote" role="status" aria-live="polite">Preview only: this form does not send or save messages. Please do not enter sensitive information.</p>
+      </form>
     </section>
   </main>
   <footer class="site-footer">
     <p>&copy; <span id="currentYear"></span> Petros Curious Mind. All rights reserved.</p>
-    <div class="footer-links"><a href="about.html">About</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms and Conditions</a><a href="signin.html">Sign In</a></div>
+    <div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms and Conditions</a></div>
   </footer>
   <script src="js/main.js"></script>
   <script>
     document.getElementById("contactForm").addEventListener("submit", function (event) {
       event.preventDefault();
-      document.getElementById("formNote").textContent = "Your message has not been sent. Message delivery will be enabled after the website backend is connected.";
+      document.getElementById("formNote").textContent = "Your message has not been sent or saved. Message delivery will be enabled after the website backend is connected.";
     });
   </script>
 </body>
