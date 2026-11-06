@@ -66,11 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Automatically update copyright year
-  const yearElement = document.getElementById("currentYear");
-
-  if (yearElement) {
-    yearElement.textContent = new Date().getFullYear();
-  }
+  document.querySelectorAll("#currentYear, #current-year, #adminYear").forEach((element) => {
+    element.textContent = new Date().getFullYear();
+  });
 
   // Header shadow when scrolling
   const header = document.querySelector(".site-header");
