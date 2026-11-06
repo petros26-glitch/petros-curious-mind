@@ -37,7 +37,7 @@
       <h1>My Profile</h1>
 
       <p>
-        Manage your personal information and account settings.
+        Account settings preview. Sign-in and profile storage are not active yet.
       </p>
 
     </section>
@@ -52,9 +52,9 @@
           <span>👤</span>
         </div>
 
-        <h2 id="profile-name">Your Name</h2>
+        <h2 id="profile-name">Profile preview</h2>
 
-        <p id="profile-email">your@email.com</p>
+        <p id="profile-email">No account connected</p>
 
       </div>
 
@@ -64,6 +64,7 @@
 
         <h2>Profile Information</h2>
 
+        <p class="form-note" role="status">Preview only: this page is not connected to an account. Changes will not be saved.</p>
         <form id="profile-form">
 
           <div class="form-group">
@@ -129,7 +130,7 @@
 
           <div>
             <h3>Sign Out</h3>
-            <p>Sign out of your Petros Curious Mind account.</p>
+            <p>Sign-out will be available after secure account sign-in is connected.</p>
           </div>
 
           <button
@@ -185,7 +186,7 @@
       event.preventDefault();
 
       profileMessage.textContent =
-        "Profile updates will be available after the backend is connected.";
+        "Nothing was saved. Profile updates will be enabled after secure account sign-in and backend storage are connected.";
 
     });
 
@@ -194,7 +195,7 @@
       .addEventListener("click", function() {
 
         alert(
-          "Sign out will be available after account authentication is connected."
+          "No account is signed in on this preview page."
         );
 
       });
