@@ -3,257 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <meta name="description" content="Sign in to your Petros Curious Mind account.">
-
+  <meta name="description" content="Sign in to Petros Curious Mind.">
   <title>Sign In | Petros Curious Mind</title>
-
   <link rel="stylesheet" href="css/style.css">
-
-  <style>
-    .auth-section {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 55px 20px 70px;
-    }
-
-    .auth-container {
-      width: 100%;
-      max-width: 460px;
-      margin: 0 auto;
-      box-sizing: border-box;
-    }
-
-    .auth-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .auth-header h1 {
-      margin-bottom: 12px;
-    }
-
-    .auth-header p {
-      line-height: 1.7;
-    }
-
-    .auth-card {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 30px;
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 8px 28px rgba(10,45,90,.09);
-    }
-
-    .auth-card label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
-
-    .auth-card input[type="email"],
-    .auth-card input[type="password"],
-    .auth-card input[type="text"] {
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 13px;
-      margin-bottom: 20px;
-      border: 1px solid #ccd7e5;
-      border-radius: 10px;
-      font: inherit;
-    }
-
-    .password-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 22px;
-      font-size: .9rem;
-    }
-
-    .remember-option {
-      display: flex !important;
-      align-items: center;
-      gap: 7px;
-      margin: 0 !important;
-      font-weight: 400 !important;
-    }
-
-    .auth-button {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 999px;
-      background: #0878e8;
-      color: #fff;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .auth-button:hover {
-      background: #0758ad;
-    }
-
-    .auth-switch {
-      text-align: center;
-      margin-top: 24px;
-      line-height: 1.7;
-    }
-
-    .auth-message {
-      margin-top: 15px;
-      text-align: center;
-      line-height: 1.6;
-    }
-
-    .password-toggle {
-      margin-top: -10px;
-      margin-bottom: 18px;
-      font-size: .9rem;
-    }
-
-    @media(max-width: 480px) {
-      .auth-section {
-        padding: 35px 16px 50px;
-      }
-
-      .auth-card {
-        padding: 22px 18px;
-      }
-    }
-  </style>
 </head>
-
 <body>
-
-  <header>
-    <nav class="navbar">
-      <a class="logo" href="index.html">Petros Curious Mind</a>
-
-      <button
-        class="menu-toggle"
-        type="button"
-        aria-label="Toggle navigation"
-        aria-expanded="false">
-        ☰
-      </button>
-
-      <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="stories.html">Stories</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="signin.html">Sign In</a></li>
-      </ul>
+  <header class="site-header">
+    <a class="brand" href="index.html"><img src="images/logo.png" alt="Petros Curious Mind logo" class="brand-logo"><span>Petros Curious Mind</span></a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">☰</button>
+    <nav class="navigation" id="navigation" aria-label="Main navigation">
+      <a href="index.html">Home</a><a href="stories.html">Stories</a><a href="about.html">About</a><a href="contact.html">Contact</a><a href="signin.html" class="nav-signin" aria-current="page">Sign In</a>
     </nav>
   </header>
-
-  <main>
-
-    <section class="auth-section">
-
-      <div class="auth-container">
-
-        <div class="auth-header">
-          <h1>Welcome Back</h1>
-          <p>Sign in to continue exploring the stories behind every story.</p>
-        </div>
-
-        <form class="auth-card" id="signinForm">
-
-          <label for="email">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            autocomplete="email"
-            placeholder="Enter your email"
-            required>
-
-          <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            autocomplete="current-password"
-            placeholder="Enter your password"
-            required>
-
-          <div class="password-toggle">
-            <label class="remember-option">
-              <input type="checkbox" id="showPassword">
-              Show password
-            </label>
-          </div>
-
-          <div class="password-options">
-            <label class="remember-option">
-              <input type="checkbox" id="rememberMe">
-              Remember me
-            </label>
-
-            <a href="change-password.html">Forgot password?</a>
-          </div>
-
-          <button type="submit" class="auth-button">
-            Sign In
-          </button>
-
-          <p class="auth-message" id="signinMessage" role="status">
-            Sign-in functionality will be connected when the backend is ready.
-          </p>
-
-          <div class="auth-switch">
-            Don't have an account?
-            <a href="signup.html">Create an account</a>
-          </div>
-
-        </form>
-
+  <main class="auth-page">
+    <section class="auth-shell">
+      <div class="auth-brand-panel">
+        <p class="eyebrow">Welcome to Petros Curious Mind</p><h1>The Story Behind Every Story</h1>
+        <p>Return to a place where folklore, culture and imagination meet.</p>
+        <div class="auth-quote"><span>“</span><p>Every story opens a door to another world.</p></div>
       </div>
-
+      <div class="auth-form-panel">
+        <div class="auth-form-heading"><p class="eyebrow">Your account</p><h2>Welcome back</h2><p>Sign in to continue your journey.</p></div>
+        <form id="signinForm" class="auth-form">
+          <div class="form-field"><label for="email">Email address</label><input type="email" id="email" name="email" autocomplete="email" placeholder="Enter your email" required></div>
+          <div class="form-field"><label for="password">Password</label><input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required></div>
+          <div class="auth-options"><label class="check-line"><input type="checkbox" id="showPassword"> <span>Show password</span></label><label class="check-line"><input type="checkbox" id="rememberMe" name="rememberMe"> <span>Remember me</span></label></div>
+          <button type="submit" class="button button-primary auth-submit">Sign In <span aria-hidden="true">→</span></button>
+          <p class="form-note" id="signinMessage" role="status" aria-live="polite">Preview only: sign-in is not active. Your details will not be sent, checked or saved.</p>
+        </form>
+        <p class="auth-bottom">Don't have an account? <a href="signup.html">Create an account</a></p>
+        <p class="auth-help"><a href="contact.html">Need help signing in?</a></p>
+      </div>
     </section>
-
   </main>
-
   <footer class="site-footer">
-    <p>
-      &copy; <span id="current-year"></span>
-      Petros Curious Mind. All rights reserved.
-    </p>
-
-    <div class="footer-links">
-      <a href="privacy.html">Privacy Policy</a>
-      <a href="terms.html">Terms and Conditions</a>
-    </div>
+    <p>&copy; <span id="currentYear"></span> Petros Curious Mind. All rights reserved.</p>
+    <div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms and Conditions</a></div>
   </footer>
-
   <script src="js/main.js"></script>
-
   <script>
+    const passwordInput = document.getElementById("password");
     document.getElementById("showPassword").addEventListener("change", function () {
-      document.getElementById("password").type =
-        this.checked ? "text" : "password";
+      passwordInput.type = this.checked ? "text" : "password";
     });
-
     document.getElementById("signinForm").addEventListener("submit", function (event) {
       event.preventDefault();
-
-      document.getElementById("signinMessage").textContent =
-        "Sign-in is not connected yet. Backend authentication will be added later.";
+      document.getElementById("signinMessage").textContent = "Sign-in is not connected yet. No account details were sent or checked.";
     });
-
-    const year = document.getElementById("current-year");
-    if (year) {
-      year.textContent = new Date().getFullYear();
-    }
   </script>
-
 </body>
 </html>
