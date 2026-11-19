@@ -89,9 +89,11 @@
       await Promise.all([loadStories(), loadOverview()]);
     }
     async function deleteStory(story) {
-      if (!confirm("Delete “" + story.title + "”? This also deletes its comments and likes.")) return;
+      if (!confirm(`Delete "${story.title}"? This also deletes its comments and likes.`)) return;
+      const { data: record } = await c.from("stories").select("image_path").eq("id", story.id).maybeSingle();
       const { error } = await c.from("stories").delete().eq("id", story.id);
       if (error) return alert(error.message);
+      if (record && record.image_path) await c.storage.from("story-images").remove([record.image_path]);
       await Promise.all([loadStories(), loadOverview()]);
     }
     document.getElementById("storyForm").addEventListener("submit", async (event) => {
@@ -104,7 +106,7 @@
       const published = document.getElementById("storyPublished").checked;
       if (!title || !content) return setStatus("storyMessage", "Title and story content are required.", true);
       const { data: { user: currentUser } } = await c.auth.getUser();
-      const payload = { title, slug: slugify(title), excerpt, content, featured, published, published_at: published ? new Date().toISOString() : null, updated_at: new Date().toISOString() };
+      const payload = { title, slug: slugify(title) + "-" + (id ? id.slice(0, 6) : crypto.randomUUID().slice(0, 6)), excerpt, content, featured, published, published_at: published ? new Date().toISOString() : null, updated_at: new Date().toISOString() };
       const file = document.getElementById("storyImage").files[0];
       if (file) {
         if (!["image/jpeg","image/png","image/webp","image/gif"].includes(file.type) || file.size > 5 * 1024 * 1024) {
