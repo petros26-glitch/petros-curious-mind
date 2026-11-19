@@ -78,13 +78,17 @@
       ${story.excerpt ? `<p class="story-detail-excerpt">${escapeHtml(story.excerpt)}</p>` : ""}
       <div class="story-detail-meta">Published ${story.published_at ? new Date(story.published_at).toLocaleDateString() : ""}</div>
       <div class="story-detail-content">${escapeHtml(story.content).replace(/\n/g, "<br>")}</div>
-      <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like <span id="likeCount">0</span></button><span id="likeMessage" role="status"></span></div>`;
+      <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like</button><span id="likeMessage" role="status"></span></div>`;
     await loadComments(c, story.id);
     const likeButton = document.getElementById("likeStory");
-    const likeCount = document.getElementById("likeCount");
     const likeMessage = document.getElementById("likeMessage");
-    const { count } = await c.from("likes").select("*", { count: "exact", head: true }).eq("story_id", story.id);
-    likeCount.textContent = String(count || 0);
+    const { data: { user: currentReader } } = await c.auth.getUser();
+    let alreadyLiked = false;
+    if (currentReader) {
+      const { data: ownLike } = await c.from("likes").select("id").eq("story_id", story.id).eq("user_id", currentReader.id).maybeSingle();
+      alreadyLiked = Boolean(ownLike);
+    }
+    likeButton.textContent = alreadyLiked ? "♥ Liked" : "♡ Like";
     likeButton.addEventListener("click", async () => {
       const { data: { user } } = await c.auth.getUser();
       if (!user) {
@@ -95,13 +99,14 @@
       if (existing) {
         const { error: removeError } = await c.from("likes").delete().eq("id", existing.id);
         if (removeError) return likeMessage.textContent = removeError.message;
+        likeButton.textContent = "♡ Like";
+        likeMessage.textContent = "Like removed.";
       } else {
         const { error: addError } = await c.from("likes").insert({ story_id: story.id, user_id: user.id });
         if (addError) return likeMessage.textContent = addError.message;
+        likeButton.textContent = "♥ Liked";
+        likeMessage.textContent = "You liked this story.";
       }
-      const { count: nextCount } = await c.from("likes").select("*", { count: "exact", head: true }).eq("story_id", story.id);
-      likeCount.textContent = String(nextCount || 0);
-      likeMessage.textContent = existing ? "Like removed." : "You liked this story.";
     });
     const form = document.getElementById("commentForm");
     if (form) {
