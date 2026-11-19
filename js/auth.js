@@ -113,6 +113,13 @@
 
         if (error) return setMessage(message, error.message, true);
         if (data.session) {
+          // Welcome email is sent server-side. A mail delivery issue must not block account access.
+          const { error: welcomeError } = await client.functions.invoke("send-welcome-email", {
+            body: { fullName }
+          });
+          if (welcomeError) {
+            console.error("Welcome email could not be sent:", welcomeError.message);
+          }
           setMessage(message, "Your account has been created. You are now signed in.", false);
           window.location.href = "profile.html";
         } else {
