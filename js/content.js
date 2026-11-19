@@ -45,12 +45,12 @@
   async function loadPublicStories() {
     const c = client();
     if (!c) return;
-    const fields = "id,title,slug,excerpt,image_path,featured,views,created_at,published_at";
+    const fields = "id,title,slug,excerpt,image_path,featured,views,likes_count,created_at,published_at";
     const recent = document.getElementById("recentStoriesGrid");
     const popular = document.getElementById("popularStoriesGrid");
     const all = document.getElementById("storiesGrid");
     if (recent) await loadGrid(recent, c.from("stories").select(fields).eq("published", true).order("published_at", { ascending: false }).limit(3), "New stories will appear here as they are added.");
-    if (popular) await loadGrid(popular, c.from("stories").select(fields).eq("published", true).order("views", { ascending: false }).order("published_at", { ascending: false }).limit(3), "Popular stories will appear here as readers discover them.");
+    if (popular) await loadGrid(popular, c.from("stories").select(fields).eq("published", true).order("likes_count", { ascending: false }).order("published_at", { ascending: false }).limit(3), "Popular stories will appear here as readers discover them.");
     if (all) await loadGrid(all, c.from("stories").select(fields).eq("published", true).order("published_at", { ascending: false }), "There are no stories available to read just yet.");
   }
 
