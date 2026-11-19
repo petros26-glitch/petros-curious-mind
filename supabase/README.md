@@ -15,7 +15,7 @@ RLS is enabled on every application table. The public-facing app uses only the S
 
 ## First administrator setup
 
-1. Register the owner's account through the website and confirm the email.
+1. Register the owner's account through the website. Email confirmation should be disabled so users can sign in immediately.
 2. In Supabase SQL Editor, run this statement after replacing the placeholder with the exact account email:
 
 ```sql
@@ -32,9 +32,9 @@ Do not automatically make the first person to register an administrator. Role as
 
 ## Supabase Auth URL configuration
 
-In Supabase Dashboard → Authentication → URL Configuration:
+In Supabase Dashboard → Authentication → Sign In / Providers → Email, turn **Confirm email** off. This allows immediate signup without clicking a confirmation link. Supabase will not send a signup-confirmation email while this is off. To send a separate welcome email, configure a transactional email provider (SMTP or an Auth Send Email Hook) first.\n\nIn Supabase Dashboard → Authentication → URL Configuration:
 - Set the Site URL to the deployed website's exact origin.
-- Add the deployed origin plus `/**` to Redirect URLs so email confirmation can return to `signin.html`.
+- Add the deployed origin plus `/**` to Redirect URLs for allowed authentication redirects.
 
 Use the same origin where the website is deployed. Add a localhost redirect only if you test locally.
 
