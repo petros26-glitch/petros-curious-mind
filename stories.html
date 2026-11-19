@@ -68,10 +68,7 @@
     </section>
 
     <section class="section-wrap">
-      <div class="stories-empty">
-        <h2>Stories are on their way.</h2>
-        <p>There are no stories available to read here just yet. Once stories are added, you will be able to explore them on this page.</p>
-      </div>
+      <div class="story-grid" id="storiesGrid"><p class="empty-state">Loading stories…</p></div>
     </section>
   </main>
 
@@ -105,6 +102,10 @@
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.1"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/content.js"></script>
 </body>
 </html>
