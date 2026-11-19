@@ -43,3 +43,21 @@ Use the same origin where the website is deployed. Add a localhost redirect only
 - The project currently has no registered users or story content. The tables are intentionally empty after setup.
 - The browser dashboard lists public profile names only; it does not expose private Auth credentials.
 - Auth user administration (suspending/deleting accounts) must be implemented through a separately protected server-side function. Do not use the service-role key in the browser.
+
+
+## Automatic welcome emails (Resend)
+
+The `send-welcome-email` Edge Function sends a welcome message after a user signs up and receives an active session. It validates the caller's Supabase access token and takes the recipient address from the authenticated user record; it never trusts a browser-supplied recipient.
+
+Before enabling this:
+1. Create a Resend account and verify a domain you control in Resend.
+2. Create a Resend API key.
+3. Set these Edge Function secrets in Supabase (Project Settings → Edge Functions → Secrets, or the CLI):
+   - `RESEND_API_KEY`: the Resend API key.
+   - `WELCOME_FROM_EMAIL`: a sender address on the verified domain, e.g. `stories@your-verified-domain.com`.
+   - `SITE_URL`: `https://petros-curious-mind-test.onrender.com`.
+   Supabase provides `SUPABASE_URL` and `SUPABASE_ANON_KEY` to Edge Functions.
+4. In Supabase Authentication → Sign In / Providers → Email, switch **Confirm email** off to allow signup without a confirmation click. This also means signup confirmation messages are not sent; the separate Resend welcome message is sent after account creation.
+5. Deploy the `send-welcome-email` Edge Function and test with a new account.
+
+The welcome email is best-effort: an email provider outage does not prevent a newly registered user from accessing their account. Never place the Resend API key in frontend JavaScript.
