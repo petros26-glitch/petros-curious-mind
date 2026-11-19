@@ -1,55 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sign in to Petros Curious Mind.">
-  <title>Sign In | Petros Curious Mind</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <header class="site-header">
-    <a class="brand" href="index.html"><img src="images/logo.png" alt="Petros Curious Mind logo" class="brand-logo"><span>Petros Curious Mind</span></a>
-    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">☰</button>
-    <nav class="navigation" id="navigation" aria-label="Main navigation">
-      <a href="index.html">Home</a><a href="stories.html">Stories</a><a href="about.html">About</a><a href="contact.html">Contact</a><a href="signin.html" class="nav-signin" aria-current="page">Sign In</a>
-    </nav>
-  </header>
-  <main class="auth-page">
-    <section class="auth-shell">
-      <div class="auth-brand-panel">
-        <p class="eyebrow">Welcome to Petros Curious Mind</p><h1>The Story Behind Every Story</h1>
-        <p>Return to a place where folklore, culture and imagination meet.</p>
-        <div class="auth-quote"><span>“</span><p>Every story opens a door to another world.</p></div>
-      </div>
-      <div class="auth-form-panel">
-        <div class="auth-form-heading"><p class="eyebrow">Your account</p><h2>Welcome back</h2><p>Sign in to continue your journey.</p></div>
-        <form id="signinForm" class="auth-form">
-          <div class="form-field"><label for="email">Email address</label><input type="email" id="email" name="email" autocomplete="email" placeholder="Enter your email" required></div>
-          <div class="form-field"><label for="password">Password</label><input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required></div>
-          <div class="auth-options"><label class="check-line"><input type="checkbox" id="showPassword"> <span>Show password</span></label><label class="check-line"><input type="checkbox" id="rememberMe" name="rememberMe"> <span>Remember me</span></label></div>
-          <button type="submit" class="button button-primary auth-submit">Sign In <span aria-hidden="true">→</span></button>
-          <p class="form-note" id="signinMessage" role="status" aria-live="polite">Preview only: sign-in is not active. Your details will not be sent, checked or saved.</p>
-        </form>
-        <p class="auth-bottom">Don't have an account? <a href="signup.html">Create an account</a></p>
-        <p class="auth-help"><a href="contact.html">Need help signing in?</a></p>
-      </div>
-    </section>
-  </main>
-  <footer class="site-footer">
-    <p>&copy; <span id="currentYear"></span> Petros Curious Mind. All rights reserved.</p>
-    <div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms and Conditions</a></div>
-  </footer>
-  <script src="js/main.js"></script>
-  <script>
-    const passwordInput = document.getElementById("password");
-    document.getElementById("showPassword").addEventListener("change", function () {
-      passwordInput.type = this.checked ? "text" : "password";
-    });
-    document.getElementById("signinForm").addEventListener("submit", function (event) {
-      event.preventDefault();
-      document.getElementById("signinMessage").textContent = "Sign-in is not connected yet. No account details were sent or checked.";
-    });
-  </script>
-</body>
-</html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="description" content="Sign in to Petros Curious Mind."><title>Sign In | Petros Curious Mind</title><link rel="stylesheet" href="css/style.css"></head><body>
+<header class="site-header"><a class="brand" href="index.html"><img src="images/logo.png" alt="Petros Curious Mind logo" class="brand-logo"><span>Petros Curious Mind</span></a><button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation">☰</button><nav class="navigation" id="navigation" aria-label="Main navigation"><a href="index.html">Home</a><a href="stories.html">Stories</a><a href="about.html">About</a><a href="contact.html">Contact</a><a href="signin.html" class="nav-signin" aria-current="page">Sign In</a></nav></header>
+<main class="auth-page"><section class="auth-shell"><div class="auth-brand-panel"><p class="eyebrow">Welcome to Petros Curious Mind</p><h1>The Story Behind Every Story</h1><p>Return to a place where folklore, culture and imagination meet.</p><div class="auth-quote"><span>“</span><p>Every story opens a door to another world.</p></div></div>
+<div class="auth-form-panel"><div class="auth-form-heading"><p class="eyebrow">Your account</p><h2>Welcome back</h2><p>Sign in to continue your journey.</p></div>
+<form id="signinForm" class="auth-form"><div class="form-field"><label for="email">Email address</label><input type="email" id="email" name="email" autocomplete="email" placeholder="Enter your email" required></div>
+<div class="form-field"><label for="password">Password</label><input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required></div>
+<div class="auth-options"><label class="check-line"><input type="checkbox" id="showPassword"><span>Show password</span></label></div>
+<button type="submit" class="button button-primary auth-submit">Sign In <span aria-hidden="true">→</span></button><p class="form-note" id="signinMessage" role="status" aria-live="polite">Your account details are sent securely to Supabase Auth when you sign in.</p></form>
+<p class="auth-bottom">Don't have an account? <a href="signup.html">Create an account</a></p><p class="auth-help"><a href="contact.html">Need help signing in?</a></p></div></section></main>
+<footer class="site-footer"><p>© <span id="currentYear"></span> Petros Curious Mind. All rights reserved.</p><div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms and Conditions</a></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.1"></script><script src="js/supabase-client.js"></script><script src="js/main.js"></script><script src="js/auth.js"></script></body></html>
