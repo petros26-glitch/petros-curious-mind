@@ -106,7 +106,6 @@
           password,
           options: {
             data: { full_name: fullName },
-            emailRedirectTo: window.location.origin + "/signin.html"
           }
         });
         submit.disabled = false;
@@ -117,7 +116,7 @@
           setMessage(message, "Your account has been created. You are now signed in.", false);
           window.location.href = "profile.html";
         } else {
-          setMessage(message, "Account created. Check your email for the confirmation link, then return here to sign in.", false);
+          setMessage(message, "Your account was created, but email confirmation is still enabled in the authentication settings. Please contact the site administrator.", true);
           signUpForm.reset();
         }
       });
