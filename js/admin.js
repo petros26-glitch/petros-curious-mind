@@ -106,7 +106,8 @@
       const published = document.getElementById("storyPublished").checked;
       if (!title || !content) return setStatus("storyMessage", "Title and story content are required.", true);
       const { data: { user: currentUser } } = await c.auth.getUser();
-      const payload = { title, slug: slugify(title) + "-" + (id ? id.slice(0, 6) : crypto.randomUUID().slice(0, 6)), excerpt, content, featured, published, published_at: published ? new Date().toISOString() : null, updated_at: new Date().toISOString() };
+      const baseSlug = slugify(title) || "story";
+      const payload = { title, slug: baseSlug + "-" + (id ? id.slice(0, 6) : crypto.randomUUID().slice(0, 6)), excerpt, content, featured, published, published_at: published ? new Date().toISOString() : null, updated_at: new Date().toISOString() };
       const file = document.getElementById("storyImage").files[0];
       if (file) {
         if (!["image/jpeg","image/png","image/webp","image/gif"].includes(file.type) || file.size > 5 * 1024 * 1024) {
