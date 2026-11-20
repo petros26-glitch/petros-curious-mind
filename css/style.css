@@ -852,7 +852,7 @@ button {
 
     background: linear-gradient(
         120deg,
-        #0754a5,
+        #465238,
         #68734b
     );
 
@@ -1400,7 +1400,7 @@ button:focus-visible {
 
     background: linear-gradient(
         135deg,
-        #e8f3ff,
+        #f0e7d7,
         #c9e2ff
     );
 
@@ -1724,7 +1724,7 @@ button:focus-visible {
 .form-note { margin:16px 0 0; padding:12px 14px; border-radius:8px; background:#f2f7fc; color:#617287; font-size:12px; line-height:1.7; }
 .auth-page { padding:58px 22px 72px; background:linear-gradient(180deg,#f5f9fe 0%,#fff 100%); }
 .auth-shell { display:grid; grid-template-columns:.92fr 1.08fr; width:min(100%,1000px); min-height:620px; margin:0 auto; overflow:hidden; border:1px solid #ded2bd; border-radius:20px; background:#fff; box-shadow:0 18px 55px rgba(18,66,112,.11); }
-.auth-brand-panel { position:relative; display:flex; flex-direction:column; justify-content:center; overflow:hidden; padding:58px 48px; background:linear-gradient(145deg,#465238,#68734b 65%,#2b94f2); color:#fff; }
+.auth-brand-panel { position:relative; display:flex; flex-direction:column; justify-content:center; overflow:hidden; padding:58px 48px; background:linear-gradient(145deg,#465238,#68734b 65%,#707b52); color:#fff; }
 .auth-brand-panel::after { content:""; position:absolute; width:330px; height:330px; right:-160px; bottom:-155px; border:1px solid rgba(255,255,255,.2); border-radius:50%; box-shadow:0 0 0 35px rgba(255,255,255,.05),0 0 0 75px rgba(255,255,255,.035); }
 .auth-brand-panel .eyebrow { color:#c7e4ff; }
 .auth-brand-panel h1 { position:relative; z-index:1; margin:14px 0 18px; color:#fff; font:800 clamp(32px,4vw,45px)/1.15 Manrope,sans-serif; letter-spacing:-1px; }
@@ -1795,7 +1795,7 @@ button:focus-visible {
   padding: 34px;
   border: 1px solid rgba(255,255,255,.24);
   border-radius: 18px;
-  background: linear-gradient(145deg,#465238 0%,#68734b 68%,#3197ef 100%);
+  background: linear-gradient(145deg,#465238 0%,#68734b 68%,#707b52 100%);
   box-shadow: 0 16px 38px rgba(7,88,173,.2);
   color:#fff;
 }
@@ -1813,7 +1813,7 @@ button:focus-visible {
   box-shadow:0 16px 40px rgba(7,88,173,.1);
 }
 .auth-brand-panel {
-  background:linear-gradient(145deg,#064b91 0%,#075fb9 48%,#68734b 100%);
+  background:linear-gradient(145deg,#465238 0%,#68734b 48%,#68734b 100%);
 }
 .auth-brand-panel::before {
   content:"";
