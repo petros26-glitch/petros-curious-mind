@@ -46,7 +46,18 @@ Deno.serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    let serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!serviceKey) {
+      const secretKeys = Deno.env.get("SUPABASE_SECRET_KEYS");
+      if (secretKeys) {
+        try {
+          const parsed = JSON.parse(secretKeys);
+          serviceKey = typeof parsed.default === "string" ? parsed.default : null;
+        } catch {
+          serviceKey = null;
+        }
+      }
+    }
     if (!supabaseUrl || !anonKey || !serviceKey) {
       return json({ error: "Account deletion is not configured on the server." }, 500, headers);
     }
