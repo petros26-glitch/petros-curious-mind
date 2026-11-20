@@ -2104,3 +2104,41 @@ a:focus-visible,button:focus-visible { outline-color:#bd9254; }
 .contact-aside p { color:#f0e7d7; }
 input,textarea,select { accent-color:#68734b; }
 ::selection { background:#d8c9a9; color:#342d24; }
+
+/* Account deletion controls */
+.button-danger { display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 18px;border:1px solid #8d3e32;border-radius:9px;background:#8d3e32;color:#fff;font:700 14px inherit;cursor:pointer; }
+.button-danger:hover { background:#713026; }
+.button-danger:disabled { opacity:.65;cursor:wait; }
+.account-delete-item { display:block; }
+.delete-account-form { max-width:520px;margin-top:18px;padding:18px;border:1px solid #e4c9c1;border-radius:12px;background:#fbf1ed; }
+.delete-account-form .form-group { margin-bottom:14px; }
+.delete-account-form input { width:100%;min-height:44px;padding:10px 12px;border:1px solid #cdb5ac;border-radius:8px;background:#fff; }
+.delete-account-form .form-message { min-height:20px; }
+.delete-account-form .form-message.is-error { color:#a33d2f; }
+.delete-account-form .form-message.is-success { color:#465b35; }
+:root[data-pcm-mode="dark"] .delete-account-form { background:#2a2020;border-color:#74443d; }
+:root[data-pcm-mode="dark"] .delete-account-form input { background:#111827;color:#f3f4f6;border-color:#6b4b45; }
+.form-note { background:#eee7d8;color:#6c6253; }
+:root { --theme-border:#cfc3ad; }
+.stories-hero { background:linear-gradient(135deg,#465238,#707b52)!important;color:#fbf7ee; }
+.stories-hero .eyebrow { color:#e3d6b6!important; }
+.stories-hero p:last-child { color:#f0e7d7!important; }
+.stories-empty { border-color:rgba(104,115,75,.35);background:#fbf7ee; }
+.story-reading { color:#342d24; }
+.story-detail-excerpt,.story-detail-meta { color:#766b5c; }
+.story-detail-content { color:#342d24; }
+.comments-area { border-color:#ded2bd; }
+.comment-item { border-color:#e0d5c3; }
+.comment-item small { color:#766b5c; }
+.comment-form textarea { border-color:#cfc3ad; }
+.admin-sidebar,.admin-panel,.admin-stat { background:#fbf7ee;border-color:#e0d5c3;color:#342d24; }
+.admin-nav button.active,.admin-nav button:hover { background:#e9dfcc;color:#465238; }
+.admin-stat strong { color:#68734b; }
+.admin-list-row { border-color:#e0d5c3; }
+.admin-list-row small { color:#766b5c; }
+.admin-field input,.admin-field textarea { border-color:#cfc3ad;background:#fffdf8;color:#342d24; }
+:root[data-pcm-mode="dark"] .admin-sidebar,
+:root[data-pcm-mode="dark"] .admin-panel,
+:root[data-pcm-mode="dark"] .admin-stat { background:#1f2937;border-color:#374151;color:#e5e7eb; }
+:root[data-pcm-mode="dark"] .admin-field input,
+:root[data-pcm-mode="dark"] .admin-field textarea { background:#111827;color:#f3f4f6;border-color:#4b5563; }
