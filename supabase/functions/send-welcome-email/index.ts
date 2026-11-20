@@ -26,7 +26,7 @@ Deno.serve(async (req: Request) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const fromEmail = Deno.env.get("WELCOME_FROM_EMAIL");
-    const siteUrl = Deno.env.get("SITE_URL") ?? "https://petros-curious-mind-test.onrender.com";
+    const siteUrl = "https://petroscuriousmind.name.ng";
     if (!supabaseUrl || !anonKey || !resendKey || !fromEmail) {
       throw new Error("Welcome email service is not fully configured.");
     }
