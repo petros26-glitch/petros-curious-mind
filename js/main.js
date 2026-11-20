@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         navigation.classList.remove("is-open");
         menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Open navigation");
         menuToggle.textContent = "☰";
 
       });
@@ -44,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         navigation.classList.remove("is-open");
         menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Open navigation");
         menuToggle.textContent = "☰";
 
       }
@@ -57,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         navigation.classList.remove("is-open");
         menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Open navigation");
         menuToggle.textContent = "☰";
 
       }
