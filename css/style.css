@@ -1849,21 +1849,25 @@ button:focus-visible {
   --theme-soft: #e9dfcc;
   --theme-border: #cfe3f8;
 }
-:root[data-pcm-theme="purple"] {
-  --theme-accent:#7952c7; --theme-accent-dark:#58369c;
-  --theme-soft:#f0eaff; --theme-border:#ded0fa;
+:root[data-pcm-theme="olive"] {
+  --theme-accent:#68734b; --theme-accent-dark:#465238;
+  --theme-soft:#e9dfcc; --theme-border:#cfc3ad;
 }
-:root[data-pcm-theme="black"] {
-  --theme-accent:#30343b; --theme-accent-dark:#171a20;
-  --theme-soft:#eceef1; --theme-border:#cfd3d9;
+:root[data-pcm-theme="forest"] {
+  --theme-accent:#526b45; --theme-accent-dark:#354a2c;
+  --theme-soft:#e8eee2; --theme-border:#d1dcc7;
 }
-:root[data-pcm-theme="green"] {
-  --theme-accent:#23845b; --theme-accent-dark:#155b3d;
-  --theme-soft:#e5f5ed; --theme-border:#c6e8d6;
+:root[data-pcm-theme="terracotta"] {
+  --theme-accent:#a65e42; --theme-accent-dark:#7d432e;
+  --theme-soft:#f5e8df; --theme-border:#e6cdbf;
 }
-:root[data-pcm-theme="burgundy"] {
-  --theme-accent:#963b58; --theme-accent-dark:#68243a;
-  --theme-soft:#faeaf0; --theme-border:#efcbd7;
+:root[data-pcm-theme="wine"] {
+  --theme-accent:#7b4657; --theme-accent-dark:#57303e;
+  --theme-soft:#f3e7eb; --theme-border:#e3ccd4;
+}
+:root[data-pcm-theme="charcoal"] {
+  --theme-accent:#4a4a43; --theme-accent-dark:#30302c;
+  --theme-soft:#eeede7; --theme-border:#d7d5ca;
 }
 :root {
   --blue:var(--theme-accent);
