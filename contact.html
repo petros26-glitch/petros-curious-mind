@@ -50,7 +50,14 @@
     (() => {
       const form = document.getElementById("contactForm");
       const note = document.getElementById("formNote");
-      if (!form || !window.PCM?.supabase) return;
+      if (!form) return;
+      if (!window.PCM?.supabase) {
+        note.textContent = "The message service could not load. Please refresh the page and try again.";
+        note.classList.add("is-error");
+        const unavailableButton = form.querySelector('[type="submit"]');
+        if (unavailableButton) unavailableButton.disabled = true;
+        return;
+      }
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const button = form.querySelector('[type="submit"]');
