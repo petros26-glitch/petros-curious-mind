@@ -95,11 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
 (function () {
   const STORAGE_KEY = "pcm-visitor-preferences";
   const palettes = {
-    blue: "#0878e8",
-    purple: "#7952c7",
-    black: "#30343b",
-    green: "#23845b",
-    burgundy: "#963b58"
+    olive: "#68734b",
+    forest: "#526b45",
+    terracotta: "#a65e42",
+    wine: "#7b4657",
+    charcoal: "#4a4a43"
   };
 
   function readPreferences() {
@@ -107,10 +107,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       return {
         mode: saved.mode === "dark" ? "dark" : "light",
-        theme: palettes[saved.theme] ? saved.theme : "blue"
+        theme: palettes[saved.theme] ? saved.theme : "olive"
       };
     } catch (error) {
-      return { mode: "light", theme: "blue" };
+      return { mode: "light", theme: "olive" };
     }
   }
 
@@ -152,11 +152,11 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <h3>COLOUR THEME</h3>
       <div class="personalise-colours">
-        <button type="button" class="personalise-colour" data-pcm-theme-choice="blue" aria-pressed="true"><span class="personalise-swatch" style="background:#0878e8"></span>Blue</button>
-        <button type="button" class="personalise-colour" data-pcm-theme-choice="purple" aria-pressed="false"><span class="personalise-swatch" style="background:#7952c7"></span>Purple</button>
-        <button type="button" class="personalise-colour" data-pcm-theme-choice="black" aria-pressed="false"><span class="personalise-swatch" style="background:#30343b"></span>Black</button>
-        <button type="button" class="personalise-colour" data-pcm-theme-choice="green" aria-pressed="false"><span class="personalise-swatch" style="background:#23845b"></span>Green</button>
-        <button type="button" class="personalise-colour" data-pcm-theme-choice="burgundy" aria-pressed="false"><span class="personalise-swatch" style="background:#963b58"></span>Wine</button>
+        <button type="button" class="personalise-colour" data-pcm-theme-choice="olive" aria-pressed="true"><span class="personalise-swatch" style="background:#68734b"></span>Olive</button>
+        <button type="button" class="personalise-colour" data-pcm-theme-choice="forest" aria-pressed="false"><span class="personalise-swatch" style="background:#526b45"></span>Forest</button>
+        <button type="button" class="personalise-colour" data-pcm-theme-choice="terracotta" aria-pressed="false"><span class="personalise-swatch" style="background:#a65e42"></span>Clay</button>
+        <button type="button" class="personalise-colour" data-pcm-theme-choice="wine" aria-pressed="false"><span class="personalise-swatch" style="background:#7b4657"></span>Wine</button>
+        <button type="button" class="personalise-colour" data-pcm-theme-choice="charcoal" aria-pressed="false"><span class="personalise-swatch" style="background:#4a4a43"></span>Charcoal</button>
       </div>
       <button type="button" class="personalise-reset" id="personaliseReset">Reset to original settings</button>
     `;
@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
     document.getElementById("personaliseReset").addEventListener("click", () => {
-      preferences = { mode: "light", theme: "blue" };
+      preferences = { mode: "light", theme: "olive" };
       applyPreferences(preferences);
     });
 
