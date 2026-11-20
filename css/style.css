@@ -2055,3 +2055,26 @@ a:focus-visible,button:focus-visible { outline-color:#bd9254; }
  html { scroll-behavior:auto; }
  *,*::before,*::after { transition-duration:.01ms !important; animation-duration:.01ms !important; }
 }
+
+
+/* CONTACT — CONVERSATIONAL MESSAGE CARD */
+.contact-aside { background:linear-gradient(145deg,#465238,#707b52); }
+.contact-form-card { box-shadow:0 18px 48px rgba(66,49,29,.09); }
+.contact-form-card .form-card-heading > span {
+  display:inline-block; color:#8a7048; font-size:11px; font-weight:800; letter-spacing:1.8px;
+}
+.contact-form-card .form-card-heading h2 { color:#342d24; }
+.contact-form-card .form-card-heading p { color:#766b5c; }
+.contact-submit:disabled { opacity:.7; cursor:wait; transform:none; }
+.contact-form-card .form-note { min-height:24px; margin-top:12px; }
+.contact-form-card .form-note.is-success { color:#465b35; }
+.contact-form-card .form-note.is-error { color:#a33d2f; }
+.contact-honeypot { position:absolute !important; left:-10000px !important; width:1px; height:1px; overflow:hidden; }
+.contact-form-card input,
+.contact-form-card textarea { border-radius:9px; }
+.contact-form-card input:focus,
+.contact-form-card textarea:focus { outline:2px solid rgba(104,115,75,.25); border-color:#68734b; }
+@media(max-width:760px) {
+  .contact-layout { gap:24px; }
+  .contact-form-card { padding:24px 20px; }
+}
