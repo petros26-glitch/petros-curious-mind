@@ -2385,3 +2385,12 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 :root[data-pcm-mode="dark"] select:focus-visible {
   outline-color:#f4d99f;
 }
+
+@media (max-width:800px) {
+  .site-header .navigation a {
+    font-size:16px;
+    line-height:1.5;
+    font-weight:700;
+  }
+}
+.personalise-colour { font-size:12px; }
