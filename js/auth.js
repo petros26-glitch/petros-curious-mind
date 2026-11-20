@@ -113,15 +113,28 @@
 
         if (error) return setMessage(message, error.message, true);
         if (data.session) {
-          // Welcome email is sent server-side. A mail delivery issue must not block account access.
-          const { error: welcomeError } = await client.functions.invoke("send-welcome-email", {
-            body: { fullName }
-          });
-          if (welcomeError) {
-            console.error("Welcome email could not be sent:", welcomeError.message);
+          // A welcome-email issue must never prevent a successful signup.
+          let welcomeSent = false;
+          try {
+            const { error: welcomeError } = await client.functions.invoke("send-welcome-email", {
+              body: { fullName }
+            });
+            if (welcomeError) {
+              console.error("Welcome email could not be sent:", welcomeError.message);
+            } else {
+              welcomeSent = true;
+            }
+          } catch (welcomeError) {
+            console.error("Welcome email request failed:", welcomeError);
           }
-          setMessage(message, "Your account has been created. You are now signed in.", false);
-          window.location.href = "profile.html";
+          setMessage(
+            message,
+            welcomeSent
+              ? "Your account is ready. A welcome message has been sent to your email."
+              : "Your account is ready, but the welcome email could not be sent just now. You can still use your account.",
+            false
+          );
+          window.setTimeout(() => { window.location.href = "profile.html"; }, 1200);
         } else {
           setMessage(message, "Your account was created, but email confirmation is still enabled in the authentication settings. Please contact the site administrator.", true);
           signUpForm.reset();
