@@ -207,6 +207,65 @@
           window.location.href = "index.html";
         });
       }
+
+      const deleteForm = document.getElementById("delete-account-form");
+      if (deleteForm) {
+        deleteForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const message = document.getElementById("delete-account-message");
+          const button = document.getElementById("delete-account-button");
+          const password = document.getElementById("delete-password").value;
+          const confirmation = document.getElementById("delete-confirmation").value.trim();
+
+          if (confirmation !== "DELETE") {
+            return setMessage(message, "Type DELETE exactly to confirm permanent account removal.", true);
+          }
+          if (!password) return setMessage(message, "Enter your current password to continue.", true);
+          if (!window.confirm("This permanently deletes your account, profile, comments and likes. Your published stories may remain without your account name. This cannot be undone. Continue?")) return;
+
+          button.disabled = true;
+          button.textContent = "Verifying your account…";
+          setMessage(message, "Verifying your password and preparing secure deletion…", false);
+
+          const { data: { user: currentUser }, error: userError } = await client.auth.getUser();
+          if (userError || !currentUser?.email) {
+            button.disabled = false;
+            button.textContent = "Permanently Delete My Account";
+            return setMessage(message, "Your session has expired. Please sign in again.", true);
+          }
+
+          const { error: reauthError } = await client.auth.signInWithPassword({
+            email: currentUser.email,
+            password
+          });
+          if (reauthError) {
+            button.disabled = false;
+            button.textContent = "Permanently Delete My Account";
+            return setMessage(message, "Your current password is incorrect. Your account has not been changed.", true);
+          }
+
+          button.textContent = "Deleting account…";
+          const { data, error: deleteError } = await client.functions.invoke("delete-account", { body: {} });
+          if (deleteError || !data?.success) {
+            let detail = deleteError?.message || "Account deletion could not be completed.";
+            try {
+              const response = deleteError?.context;
+              if (response && typeof response.json === "function") {
+                const payload = await response.json();
+                if (payload?.error) detail = payload.error;
+              }
+            } catch (_) {}
+            button.disabled = false;
+            button.textContent = "Permanently Delete My Account";
+            return setMessage(message, detail, true);
+          }
+
+          setMessage(message, "Your account and associated personal records have been permanently deleted.", false);
+          document.getElementById("delete-password").value = "";
+          await client.auth.signOut({ scope: "local" }).catch(() => {});
+          window.location.replace("index.html");
+        });
+      }
     }
 
     const passwordForm = document.getElementById("password-form");
