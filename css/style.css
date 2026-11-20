@@ -2078,3 +2078,25 @@ a:focus-visible,button:focus-visible { outline-color:#bd9254; }
   .contact-layout { gap:24px; }
   .contact-form-card { padding:24px 20px; }
 }
+
+
+/* FINAL FOLKLORE PALETTE CONSISTENCY */
+.story-card .story-category,
+.story-card .eyebrow,
+.story-card .read-story,
+.story-card .read-story:hover,
+.value-card a,
+.text-link,
+.category.active { color:#68734b; }
+.story-card .read-story:hover { color:#465238; }
+.story-card .story-category,
+.story-card .eyebrow { color:#68734b; }
+.story-card .story-image,
+.story-card > img { background:#e9dfcc; }
+.button-outline { color:#465238; border-color:#cfc3ad; }
+.button-outline:hover { background:#eee7d8; }
+.contact-aside { color:#fbf7ee; }
+.contact-aside h2 { color:#fbf7ee; }
+.contact-aside p { color:#f0e7d7; }
+input,textarea,select { accent-color:#68734b; }
+::selection { background:#d8c9a9; color:#342d24; }
