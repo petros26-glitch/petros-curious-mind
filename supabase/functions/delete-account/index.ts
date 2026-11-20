@@ -45,7 +45,18 @@ Deno.serve(async (req: Request) => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    let anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!anonKey) {
+      const publishableKeys = Deno.env.get("SUPABASE_PUBLISHABLE_KEYS");
+      if (publishableKeys) {
+        try {
+          const parsed = JSON.parse(publishableKeys);
+          anonKey = typeof parsed.default === "string" ? parsed.default : null;
+        } catch {
+          anonKey = null;
+        }
+      }
+    }
     let serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!serviceKey) {
       const secretKeys = Deno.env.get("SUPABASE_SECRET_KEYS");
