@@ -7,6 +7,10 @@
   <title>Stories | Petros Curious Mind</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
+    .story-search-box { max-width: 760px; margin: 28px auto 0; text-align: left; }
+    .story-search-box label { display:block; margin-bottom:8px; font-weight:700; }
+    .story-search-box input { width:100%; padding:15px 17px; border:1px solid #d7ccb9; border-radius:12px; font:inherit; color:#342d24; background:#fff; box-sizing:border-box; }
+    .story-search-results { margin-top:18px; }
     .stories-hero {
       padding: 72px 24px 58px;
       text-align: center;
@@ -65,9 +69,11 @@
       <p class="eyebrow">Petros Curious Mind</p>
       <h1>Explore the Stories</h1>
       <p>A place to discover folklore, shared traditions and stories passed down through generations.</p>
+      <div class="story-search-box"><label for="storySearchInput">Search stories</label><input id="storySearchInput" type="search" placeholder="Search by title or words in a story..." autocomplete="off"></div>
     </section>
 
     <section class="section-wrap">
+      <div class="story-grid story-search-results" id="storySearchResults" hidden aria-live="polite"></div>
       <div class="story-grid" id="storiesGrid"><p class="empty-state">Loading stories…</p></div>
     </section>
   </main>
@@ -106,6 +112,6 @@
 <script src="js/supabase-client.js"></script>
 <script src="js/main.js"></script>
 <script src="js/auth.js?v=guest-member-20261121"></script>
-<script src="js/content.js"></script>
+<script src="js/content.js?v=search-seo-popular-20261121"></script>
 </body>
 </html>
