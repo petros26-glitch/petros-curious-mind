@@ -24,6 +24,7 @@
     if (!nav) return;
 
     const signInLink = nav.querySelector('a[href="signin.html"]');
+    let signUpLink = nav.querySelector('a[href="signup.html"]');
     const oldProfile = nav.querySelector('[data-pcm-profile-link]');
     const oldAdmin = nav.querySelector('[data-pcm-admin-link]');
     const oldSignOut = nav.querySelector('[data-pcm-signout]');
@@ -36,10 +37,19 @@
         signInLink.href = "signin.html";
         signInLink.hidden = false;
       }
+      if (!signUpLink) {
+        signUpLink = document.createElement("a");
+        signUpLink.href = "signup.html";
+        signUpLink.textContent = "Sign Up";
+        signUpLink.dataset.pcmSignupLink = "true";
+        nav.appendChild(signUpLink);
+      }
+      signUpLink.hidden = false;
       return;
     }
 
     if (signInLink) signInLink.hidden = true;
+    if (signUpLink) signUpLink.hidden = true;
 
     const profile = document.createElement("a");
     profile.href = "profile.html";
