@@ -115,26 +115,32 @@
         if (data.session) {
           // A welcome-email issue must never prevent a successful signup.
           let welcomeSent = false;
+          let welcomeProblem = "The email service did not confirm that it sent your message.";
           try {
-            const { error: welcomeError } = await client.functions.invoke("send-welcome-email", {
+            const { data: welcomeData, error: welcomeError } = await client.functions.invoke("send-welcome-email", {
               body: { fullName }
             });
             if (welcomeError) {
-              console.error("Welcome email could not be sent:", welcomeError.message);
-            } else {
+              console.error("Welcome email could not be sent:", welcomeError);
+              welcomeProblem = welcomeError.message || welcomeProblem;
+            } else if (welcomeData?.success === true && welcomeData?.id) {
               welcomeSent = true;
+            } else {
+              console.error("Welcome email returned an unexpected response:", welcomeData);
+              welcomeProblem = welcomeData?.error || welcomeProblem;
             }
           } catch (welcomeError) {
             console.error("Welcome email request failed:", welcomeError);
+            welcomeProblem = welcomeError?.message || welcomeProblem;
           }
           setMessage(
             message,
             welcomeSent
-              ? "Your account is ready. A welcome message has been sent to your email."
-              : "Your account is ready, but the welcome email could not be sent just now. You can still use your account.",
-            false
+              ? "Your account is ready. Your welcome email was accepted by our email service."
+              : "Your account is ready, but the welcome email was not sent. " + welcomeProblem + " You can retry it from your profile.",
+            !welcomeSent
           );
-          window.setTimeout(() => { window.location.href = "profile.html"; }, 1200);
+          window.setTimeout(() => { window.location.href = "profile.html"; }, 2200);
         } else {
           setMessage(message, "Your account was created, but email confirmation is still enabled in the authentication settings. Please contact the site administrator.", true);
           signUpForm.reset();
@@ -219,6 +225,37 @@
           if (signOutError) return alert(signOutError.message);
           window.location.href = "index.html";
         });
+      }
+
+      const welcomeRetry = document.getElementById("welcome-email-retry");
+      if (welcomeRetry) {
+        const welcomeStatus = document.getElementById("welcome-email-status");
+        const createdAt = Date.parse(currentUser.created_at || "");
+        const isRecentAccount = Number.isFinite(createdAt) && Date.now() - createdAt < 7 * 24 * 60 * 60 * 1000;
+        welcomeRetry.hidden = !isRecentAccount;
+        if (isRecentAccount) {
+          welcomeRetry.addEventListener("click", async () => {
+            welcomeRetry.disabled = true;
+            welcomeRetry.textContent = "Sending…";
+            setMessage(welcomeStatus, "Sending your welcome email…", false);
+            try {
+              const { data: welcomeData, error: welcomeError } = await client.functions.invoke("send-welcome-email", {
+                body: { fullName: document.getElementById("full-name")?.value?.trim() || currentUser.user_metadata?.full_name || "" }
+              });
+              if (welcomeError) throw welcomeError;
+              if (welcomeData?.success !== true || !welcomeData?.id) {
+                throw new Error(welcomeData?.error || "The email service did not confirm sending.");
+              }
+              setMessage(welcomeStatus, "Your welcome email has been accepted for delivery. Please check your inbox and spam folder.", false);
+              welcomeRetry.textContent = "Welcome Email Sent";
+            } catch (error) {
+              console.error("Welcome email retry failed:", error);
+              setMessage(welcomeStatus, error?.message || "The welcome email could not be sent. Please try again later.", true);
+              welcomeRetry.disabled = false;
+              welcomeRetry.textContent = "Retry Welcome Email";
+            }
+          });
+        }
       }
 
       const deleteForm = document.getElementById("delete-account-form");
