@@ -230,7 +230,7 @@
       const welcomeRetry = document.getElementById("welcome-email-retry");
       if (welcomeRetry) {
         const welcomeStatus = document.getElementById("welcome-email-status");
-        const createdAt = Date.parse(currentUser.created_at || "");
+        const createdAt = Date.parse(user.created_at || "");
         const isRecentAccount = Number.isFinite(createdAt) && Date.now() - createdAt < 7 * 24 * 60 * 60 * 1000;
         welcomeRetry.hidden = !isRecentAccount;
         if (isRecentAccount) {
@@ -240,7 +240,7 @@
             setMessage(welcomeStatus, "Sending your welcome email…", false);
             try {
               const { data: welcomeData, error: welcomeError } = await client.functions.invoke("send-welcome-email", {
-                body: { fullName: document.getElementById("full-name")?.value?.trim() || currentUser.user_metadata?.full_name || "" }
+                body: { fullName: document.getElementById("full-name")?.value?.trim() || user.user_metadata?.full_name || "" }
               });
               if (welcomeError) throw welcomeError;
               if (welcomeData?.success !== true || !welcomeData?.id) {
