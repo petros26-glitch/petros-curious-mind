@@ -132,6 +132,23 @@
     let canonical = document.head.querySelector('link[rel="canonical"]');
     if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
     canonical.href = pageUrl;
+    let structuredData = document.getElementById("storyStructuredData");
+    if (!structuredData) {
+      structuredData = document.createElement("script");
+      structuredData.id = "storyStructuredData";
+      structuredData.type = "application/ld+json";
+      document.head.appendChild(structuredData);
+    }
+    structuredData.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": story.title,
+      "description": description,
+      "image": image ? [image] : undefined,
+      "datePublished": story.published_at || undefined,
+      "mainEntityOfPage": { "@type": "WebPage", "@id": pageUrl },
+      "publisher": { "@type": "Organization", "name": "Petros Curious Mind", "url": "https://petroscuriousmind.name.ng/" }
+    });
     root.innerHTML = `
       ${image ? `<img class="story-detail-image" src="${escapeHtml(image)}" alt="${escapeHtml(story.title)}">` : ""}
       <p class="eyebrow">Folklore</p>
