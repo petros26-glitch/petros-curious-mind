@@ -50,6 +50,7 @@
     (() => {
       const form = document.getElementById("contactForm");
       const note = document.getElementById("formNote");
+      let memberContactDetails = null;
       if (!form) return;
       if (!window.PCM?.supabase) {
         note.textContent = "The message service could not load. Please refresh the page and try again.";
@@ -82,6 +83,7 @@
             emailField.readOnly = true;
             emailField.setAttribute("aria-readonly", "true");
           }
+          memberContactDetails = { fullName: nameField?.value || "", email: user.email || "" };
           note.textContent = "Your account details have been filled in. You can send your message below.";
         } catch (error) {
           console.warn("Could not prefill member contact details:", error);
@@ -111,6 +113,10 @@
           });
           if (error || !data?.success) throw new Error(data?.error || error?.message || "Message could not be sent.");
           form.reset();
+          if (memberContactDetails) {
+            document.getElementById("fullName").value = memberContactDetails.fullName;
+            document.getElementById("email").value = memberContactDetails.email;
+          }
           note.textContent = "Your message has been sent. Thank you for reaching out — Curious Mind will be in touch.";
           note.classList.add("is-success");
         } catch (error) {
