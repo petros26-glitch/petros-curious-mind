@@ -22,7 +22,7 @@
         <span class="story-category">Folklore</span>
         <h3>${escapeHtml(story.title)}</h3>
         <p>${escapeHtml(story.excerpt || "Discover the story behind this tale.")}</p>
-        <a class="read-story" href="story.html?id=${encodeURIComponent(story.id)}">Read Story</a>
+        <a class="read-story" href="story.html?slug=${encodeURIComponent(story.slug || story.id)}">Read Story</a>
       </div>`;
     return article;
   };
@@ -42,35 +42,96 @@
     if (!data || !data.length) return showEmpty(target, emptyMessage);
     data.forEach((story) => target.appendChild(card(story)));
   }
+  function renderGrid(target, stories, emptyMessage) {
+    if (!target) return;
+    target.innerHTML = "";
+    if (!stories.length) return showEmpty(target, emptyMessage);
+    stories.forEach((story) => target.appendChild(card(story)));
+  }
+  function wireSearch(stories) {
+    const input = document.getElementById("storySearchInput");
+    const results = document.getElementById("storySearchResults");
+    const all = document.getElementById("storiesGrid");
+    if (!input || !results) return;
+    input.addEventListener("input", () => {
+      const term = input.value.trim().toLocaleLowerCase();
+      results.innerHTML = "";
+      if (!term) { results.hidden = true; if (all) all.hidden = false; return; }
+      results.hidden = false; if (all) all.hidden = true;
+      const matches = stories.filter((story) =>
+        [story.title, story.excerpt, story.content].join(" ").toLocaleLowerCase().includes(term)
+      ).slice(0, 40);
+      if (!matches.length) return showEmpty(results, "No stories matched your search. Try another word or title.");
+      matches.forEach((story) => results.appendChild(card(story)));
+    });
+  }
   async function loadPublicStories() {
     const c = client();
     if (!c) return;
-    const fields = "id,title,slug,excerpt,image_path,featured,views,likes_count,created_at,published_at";
-    const recent = document.getElementById("recentStoriesGrid");
-    const popular = document.getElementById("popularStoriesGrid");
-    const all = document.getElementById("storiesGrid");
-    if (recent) await loadGrid(recent, c.from("stories").select(fields).eq("published", true).order("published_at", { ascending: false }).limit(3), "New stories will appear here as they are added.");
-    if (popular) await loadGrid(popular, c.from("stories").select(fields).eq("published", true).order("likes_count", { ascending: false }).order("published_at", { ascending: false }).limit(3), "Popular stories will appear here as readers discover them.");
-    if (all) await loadGrid(all, c.from("stories").select(fields).eq("published", true).order("published_at", { ascending: false }), "There are no stories available to read just yet.");
+    const fields = "id,title,slug,excerpt,content,image_path,featured,views,likes_count,created_at,published_at";
+    const { data, error } = await c.from("stories").select(fields).eq("published", true)
+      .order("published_at", { ascending: false });
+    if (error) {
+      ["recentStoriesGrid", "popularStoriesGrid", "storiesGrid", "storySearchResults"].forEach((id) => {
+        const target = document.getElementById(id);
+        if (target) showEmpty(target, "Stories could not be loaded right now. Please refresh and try again.");
+      });
+      return;
+    }
+    const stories = data || [];
+    renderGrid(document.getElementById("recentStoriesGrid"), stories.slice(0, 3), "New stories will appear here as they are added.");
+    renderGrid(document.getElementById("popularStoriesGrid"), stories.filter((story) => story.featured).slice(0, 3),
+      "Popular stories will appear here. The administrator can select them from the dashboard.");
+    renderGrid(document.getElementById("storiesGrid"), stories, "There are no stories available to read just yet.");
+    wireSearch(stories);
   }
 
   async function loadStoryPage() {
     const c = client();
     const root = document.getElementById("storyDetail");
     if (!c || !root) return;
-    const id = new URLSearchParams(location.search).get("id");
-    if (!id) {
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+    const slug = params.get("slug");
+    if (!id && !slug) {
       root.textContent = "This story link is incomplete.";
       return;
     }
     const { data: story, error } = await c.from("stories")
-      .select("id,title,excerpt,content,image_path,views,published_at")
-      .eq("id", id).eq("published", true).maybeSingle();
+      .select("id,title,slug,excerpt,content,image_path,views,published_at")
+      .eq("published", true).eq(slug ? "slug" : "id", slug || id).maybeSingle();
     if (error || !story) {
       root.textContent = "This story could not be found or is no longer available.";
       return;
     }
     const image = imageUrl(story.image_path);
+    const pageUrl = location.origin + location.pathname + "?slug=" + encodeURIComponent(story.slug || story.id);
+    document.title = story.title + " | Petros Curious Mind";
+    const description = (story.excerpt || story.content || "Read this folklore story at Petros Curious Mind.")
+      .replace(/\s+/g, " ").trim().slice(0, 300);
+    const setMeta = (selector, value) => {
+      let element = document.head.querySelector(selector);
+      if (!element) {
+        element = document.createElement("meta");
+        const match = selector.match(/(name|property)="([^"]+)"/);
+        if (match) element.setAttribute(match[1], match[2]);
+        document.head.appendChild(element);
+      }
+      element.setAttribute("content", value);
+    };
+    setMeta('meta[name="description"]', description);
+    setMeta('meta[property="og:type"]', "article");
+    setMeta('meta[property="og:site_name"]', "Petros Curious Mind");
+    setMeta('meta[property="og:title"]', story.title);
+    setMeta('meta[property="og:description"]', description);
+    setMeta('meta[property="og:url"]', pageUrl);
+    if (image) setMeta('meta[property="og:image"]', image);
+    setMeta('meta[name="twitter:card"]', image ? "summary_large_image" : "summary");
+    setMeta('meta[name="twitter:title"]', story.title);
+    setMeta('meta[name="twitter:description"]', description);
+    let canonical = document.head.querySelector('link[rel="canonical"]');
+    if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
+    canonical.href = pageUrl;
     root.innerHTML = `
       ${image ? `<img class="story-detail-image" src="${escapeHtml(image)}" alt="${escapeHtml(story.title)}">` : ""}
       <p class="eyebrow">Folklore</p>
