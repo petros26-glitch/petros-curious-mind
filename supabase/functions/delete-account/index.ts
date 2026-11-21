@@ -26,18 +26,6 @@ function json(body: Record<string, unknown>, status: number, headers: Record<str
   });
 }
 
-function getAuthTime(token: string): number | null {
-  try {
-    const payload = token.split(".")[1];
-    if (!payload) return null;
-    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const decoded = JSON.parse(atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=")));
-    return typeof decoded.auth_time === "number" ? decoded.auth_time : null;
-  } catch {
-    return null;
-  }
-}
-
 Deno.serve(async (req: Request) => {
   const headers = corsHeaders(req.headers.get("Origin"));
   if (req.method === "OPTIONS") return new Response("ok", { headers });
@@ -52,9 +40,7 @@ Deno.serve(async (req: Request) => {
         try {
           const parsed = JSON.parse(publishableKeys);
           anonKey = typeof parsed.default === "string" ? parsed.default : null;
-        } catch {
-          anonKey = null;
-        }
+        } catch { anonKey = null; }
       }
     }
     let serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -64,9 +50,7 @@ Deno.serve(async (req: Request) => {
         try {
           const parsed = JSON.parse(secretKeys);
           serviceKey = typeof parsed.default === "string" ? parsed.default : null;
-        } catch {
-          serviceKey = null;
-        }
+        } catch { serviceKey = null; }
       }
     }
     if (!supabaseUrl || !anonKey || !serviceKey) {
@@ -74,28 +58,44 @@ Deno.serve(async (req: Request) => {
     }
 
     const authorization = req.headers.get("Authorization") || "";
-    const token = authorization.replace(/^Bearer\s+/i, "");
-    if (!token || token === authorization) {
-      return json({ error: "Please sign in again before deleting your account." }, 401, headers);
+    if (!authorization.startsWith("Bearer ")) {
+      return json({ error: "Please sign in to your account before deleting it." }, 401, headers);
     }
-
-    const authTime = getAuthTime(token);
-    const now = Math.floor(Date.now() / 1000);
-    if (!authTime || now - authTime > 5 * 60 || authTime > now + 30) {
-      return json({ error: "For your security, sign in again and then retry account deletion." }, 401, headers);
-    }
+    const token = authorization.slice(7).trim();
+    if (!token) return json({ error: "Please sign in to your account before deleting it." }, 401, headers);
 
     const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
+      global: { headers: { Authorization: "Bearer " + token } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
     const { data: { user }, error: userError } = await userClient.auth.getUser(token);
-    if (userError || !user) return json({ error: "Your session could not be verified. Please sign in again." }, 401, headers);
+    if (userError || !user?.email) {
+      return json({ error: "Your session could not be verified. Please sign in and try again." }, 401, headers);
+    }
+
+    let body: { password?: unknown };
+    try { body = await req.json(); } catch {
+      return json({ error: "Enter your current password to confirm account deletion." }, 400, headers);
+    }
+    if (typeof body.password !== "string" || body.password.length < 1 || body.password.length > 1024) {
+      return json({ error: "Enter your current password to confirm account deletion." }, 400, headers);
+    }
+
+    // Verify the password server-side without changing the user's browser session.
+    const passwordClient = createClient(supabaseUrl, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: verified, error: passwordError } = await passwordClient.auth.signInWithPassword({
+      email: user.email,
+      password: body.password,
+    });
+    if (passwordError || verified.user?.id !== user.id) {
+      return json({ error: "Your current password is incorrect. Your account has not been changed." }, 401, headers);
+    }
 
     const adminClient = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-
     const { data: roles, error: rolesError } = await adminClient
       .from("user_roles").select("role").eq("user_id", user.id);
     if (rolesError) throw new Error("We could not verify your account permissions. Please try again later.");
@@ -111,17 +111,31 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    // Clean only records owned by this user. Stories remain published and are detached from the account.
+    const { error: commentsError } = await adminClient.from("comments").delete().eq("user_id", user.id);
+    if (commentsError) throw new Error("We could not remove your comments. Your account has not been deleted; please try again later.");
+
+    const { error: likesError } = await adminClient.from("likes").delete().eq("user_id", user.id);
+    if (likesError) throw new Error("We could not remove your likes. Your account has not been deleted; please try again later.");
+
+    const { error: storyError } = await adminClient.from("stories").update({ created_by: null }).eq("created_by", user.id);
+    if (storyError) throw new Error("We could not safely detach your stories. Your account has not been deleted; please try again later.");
+
+    const { error: rolesDeleteError } = await adminClient.from("user_roles").delete().eq("user_id", user.id);
+    if (rolesDeleteError) throw new Error("We could not remove your account permissions. Your account has not been deleted; please try again later.");
+
+    const { error: profileError } = await adminClient.from("profiles").delete().eq("id", user.id);
+    if (profileError) throw new Error("We could not remove your profile. Your account has not been deleted; please try again later.");
+
     const { error: deleteError } = await adminClient.auth.admin.deleteUser(user.id);
     if (deleteError) {
       console.error("Account deletion failed:", deleteError.message);
-      return json({
-        error: "We could not complete account deletion. If this account owns uploaded files, those files must be transferred or removed first."
-      }, 409, headers);
+      return json({ error: "We could not complete account deletion. Your account may still exist; please contact support before retrying." }, 409, headers);
     }
 
-    return json({ success: true, message: "Your account and associated personal records have been permanently deleted." }, 200, headers);
+    return json({ success: true, message: "Your account and personal records have been permanently deleted." }, 200, headers);
   } catch (error) {
-    console.error("Account deletion error:", error);
+    console.error("Account deletion error:", error instanceof Error ? error.message : "Unknown error");
     return json({ error: error instanceof Error ? error.message : "Unexpected account deletion error." }, 500, headers);
   }
 });
