@@ -87,7 +87,12 @@
     function isBloggerImageUrl(value) {
       try {
         const parsed = new URL(value);
-        return parsed.protocol === "https:" && /(blogger\\.googleusercontent\\.com|blogspot\\.com|googleusercontent\\.com)$/i.test(parsed.hostname);
+        const host = parsed.hostname.toLowerCase();
+        const allowedHost = host === "blogger.googleusercontent.com" ||
+          host.endsWith(".blogger.googleusercontent.com") ||
+          host === "blogspot.com" || host.endsWith(".blogspot.com") ||
+          host === "googleusercontent.com" || host.endsWith(".googleusercontent.com");
+        return parsed.protocol === "https:" && allowedHost;
       } catch (_) { return false; }
     }
     function updateImagePreview() {
