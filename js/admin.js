@@ -74,6 +74,7 @@
       document.getElementById("storyTitle").value = data.title;
       document.getElementById("storyExcerpt").value = data.excerpt || "";
       document.getElementById("storyContent").value = data.content;
+      document.getElementById("storyImageUrl").value = /^https?:\/\//i.test(data.image_path || "") ? data.image_path : "";
       document.getElementById("storyFeatured").checked = data.featured;
       document.getElementById("storyPublished").checked = data.published;
       document.getElementById("storyFormHeading").textContent = "Edit story";
@@ -93,7 +94,7 @@
       const { data: record } = await c.from("stories").select("image_path").eq("id", story.id).maybeSingle();
       const { error } = await c.from("stories").delete().eq("id", story.id);
       if (error) return alert(error.message);
-      if (record && record.image_path) await c.storage.from("story-images").remove([record.image_path]);
+      if (record && record.image_path && !/^https?:\/\//i.test(record.image_path)) await c.storage.from("story-images").remove([record.image_path]);
       await Promise.all([loadStories(), loadOverview()]);
     }
     document.getElementById("storyForm").addEventListener("submit", async (event) => {
@@ -108,16 +109,18 @@
       const { data: { user: currentUser } } = await c.auth.getUser();
       const baseSlug = slugify(title) || "story";
       const payload = { title, slug: baseSlug + "-" + (id ? id.slice(0, 6) : crypto.randomUUID().slice(0, 6)), excerpt, content, featured, published, published_at: published ? new Date().toISOString() : null, updated_at: new Date().toISOString() };
-      const file = document.getElementById("storyImage").files[0];
-      if (file) {
-        if (!["image/jpeg","image/png","image/webp","image/gif"].includes(file.type) || file.size > 5 * 1024 * 1024) {
-          return setStatus("storyMessage", "Choose a JPG, PNG, WEBP or GIF image smaller than 5 MB.", true);
+      const imageUrl = document.getElementById("storyImageUrl").value.trim();
+      if (imageUrl) {
+        let parsedImageUrl;
+        try { parsedImageUrl = new URL(imageUrl); } catch (_) {
+          return setStatus("storyMessage", "Enter a valid direct Blogger image URL.", true);
         }
-        const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]/g, "-");
-        const path = currentUser.id + "/" + crypto.randomUUID() + "-" + safeName;
-        const { error: uploadError } = await c.storage.from("story-images").upload(path, file, { upsert: false, contentType: file.type });
-        if (uploadError) return setStatus("storyMessage", uploadError.message, true);
-        payload.image_path = path;
+        if (parsedImageUrl.protocol !== "https:" || !/(blogger\.googleusercontent\.com|blogspot\.com|googleusercontent\.com)$/i.test(parsedImageUrl.hostname)) {
+          return setStatus("storyMessage", "Please use a secure direct image URL hosted by Blogger.", true);
+        }
+        payload.image_path = parsedImageUrl.href;
+      } else if (!id) {
+        payload.image_path = null;
       }
       let result;
       if (id) result = await c.from("stories").update(payload).eq("id", id);
