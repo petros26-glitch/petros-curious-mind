@@ -2514,3 +2514,96 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 
 /* Keep the homepage introduction full-width above the two story panels. */
 .home-page main > .section-wrap:nth-of-type(2) { grid-column:1 / -1; }
+
+
+/* PROFILE PAGE — HIGH-CONTRAST, CONSISTENT TEXT */
+.profile-page { color:#302a22; }
+.profile-page .page-header h1,
+.profile-page .page-header p,
+.profile-page .content-section h2,
+.profile-page .content-section h3,
+.profile-page .profile-card h2,
+.profile-page .profile-card p,
+.profile-page .profile-details h2,
+.profile-page .profile-details h3,
+.profile-page .profile-details p,
+.profile-page .profile-settings h2,
+.profile-page .settings-item h3,
+.profile-page .settings-item p,
+.profile-page .form-group label,
+.profile-page .form-message,
+.profile-page .member-activity-link,
+.profile-page .comment-item,
+.profile-page .comment-item p,
+.profile-page .comment-item small { color:#302a22; opacity:1; }
+.profile-page .page-header p,
+.profile-page .settings-item p,
+.profile-page .profile-card p,
+.profile-page .comment-item small { color:#5c5144; }
+.profile-page .profile-card,
+.profile-page .profile-details,
+.profile-page .profile-settings {
+  background:#fbf7ee; color:#302a22; border-color:#cfc3ad;
+}
+.profile-page .profile-details input,
+.profile-page .profile-details textarea {
+  color:#302a22; background:#fff; border:1px solid #bcae98;
+}
+.profile-page .profile-details input::placeholder { color:#655b4e; opacity:1; }
+.profile-page .member-activity-link {
+  color:#465238; font-weight:700; text-decoration:underline; text-underline-offset:3px;
+}
+.profile-page .member-activity-link:hover { color:#68734b; }
+.profile-page .profile-avatar { color:#465238; background:#eee7d8; }
+.profile-page .form-message.is-error { color:#8d3026; }
+.profile-page .form-message.is-success { color:#36552d; }
+.profile-page .settings-item { border-color:#cfc3ad; }
+.profile-page .home-button { color:#fff; background:#465238; }
+.profile-page .home-button:hover { background:#34402a; }
+
+:root[data-pcm-mode="dark"] .profile-page,
+:root[data-pcm-mode="dark"] .profile-page .page-header h1,
+:root[data-pcm-mode="dark"] .profile-page .page-header p,
+:root[data-pcm-mode="dark"] .profile-page .content-section h2,
+:root[data-pcm-mode="dark"] .profile-page .content-section h3,
+:root[data-pcm-mode="dark"] .profile-page .profile-card h2,
+:root[data-pcm-mode="dark"] .profile-page .profile-card p,
+:root[data-pcm-mode="dark"] .profile-page .profile-details h2,
+:root[data-pcm-mode="dark"] .profile-page .profile-details h3,
+:root[data-pcm-mode="dark"] .profile-page .profile-details p,
+:root[data-pcm-mode="dark"] .profile-page .profile-settings h2,
+:root[data-pcm-mode="dark"] .profile-page .settings-item h3,
+:root[data-pcm-mode="dark"] .profile-page .settings-item p,
+:root[data-pcm-mode="dark"] .profile-page .form-group label,
+:root[data-pcm-mode="dark"] .profile-page .form-message,
+:root[data-pcm-mode="dark"] .profile-page .comment-item,
+:root[data-pcm-mode="dark"] .profile-page .comment-item p,
+:root[data-pcm-mode="dark"] .profile-page .comment-item small { color:#f3f4f6; }
+:root[data-pcm-mode="dark"] .profile-page .profile-card,
+:root[data-pcm-mode="dark"] .profile-page .profile-details,
+:root[data-pcm-mode="dark"] .profile-page .profile-settings {
+  background:#1f2937; color:#f3f4f6; border-color:#526176;
+}
+:root[data-pcm-mode="dark"] .profile-page .page-header p,
+:root[data-pcm-mode="dark"] .profile-page .settings-item p,
+:root[data-pcm-mode="dark"] .profile-page .profile-card p,
+:root[data-pcm-mode="dark"] .profile-page .comment-item small { color:#d5dbe4; }
+:root[data-pcm-mode="dark"] .profile-page .profile-details input,
+:root[data-pcm-mode="dark"] .profile-page .profile-details textarea,
+:root[data-pcm-mode="dark"] .profile-page .delete-account-form input {
+  color:#f3f4f6; background:#111827; border-color:#64748b;
+}
+:root[data-pcm-mode="dark"] .profile-page .member-activity-link {
+  color:#f4d99f; border-color:#526176;
+}
+:root[data-pcm-mode="dark"] .profile-page .profile-avatar { color:#f4d99f; background:#273449; }
+:root[data-pcm-mode="dark"] .profile-page .settings-item { border-color:#526176; }
+:root[data-pcm-mode="dark"] .profile-page .home-button { color:#fff; background:#596b3f; }
+:root[data-pcm-mode="dark"] .profile-page .form-message.is-error { color:#ffb4a9; }
+:root[data-pcm-mode="dark"] .profile-page .form-message.is-success { color:#b7e0a5; }
+@media(max-width:620px) {
+  .profile-page .member-activity > .profile-details { padding:18px 16px; }
+  .profile-page .settings-item { gap:12px; }
+  .profile-page .settings-item .home-button,
+  .profile-page .settings-item button { max-width:100%; }
+}
