@@ -34,8 +34,9 @@ jobs:
             url.replace(/\/$/, "") + "/rest/v1/stories?select=slug,published_at&published=eq.true&order=published_at.desc",
             { headers: { apikey: key, Accept: "application/json" } }
           );
-          if (!response.ok) throw new Error("Supabase returned HTTP " + response.status);
-          const stories = await response.json();
+          const responseText = await response.text();
+          if (!response.ok) throw new Error("Supabase returned HTTP " + response.status + ": " + responseText);
+          const stories = JSON.parse(responseText);
 
           const base = "https://petroscuriousmind.name.ng";
           const urls = [
