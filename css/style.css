@@ -2394,3 +2394,120 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
   }
 }
 .personalise-colour { font-size:12px; }
+
+
+/* STORY IMAGE PREVIEW IN THE ADMIN EDITOR */
+.story-image-preview-wrap {
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+  padding:12px;
+  border:1px solid var(--theme-border,#cfc3ad);
+  border-radius:12px;
+  background:rgba(104,115,75,.045);
+}
+.story-image-preview-wrap[hidden] { display:none; }
+.story-image-preview {
+  display:block;
+  width:100%;
+  max-width:520px;
+  max-height:320px;
+  height:auto;
+  object-fit:contain;
+  object-position:center;
+  border-radius:9px;
+  background:#eee7d8;
+}
+.story-image-preview[hidden] { display:none; }
+.story-image-preview-wrap p { font-size:13px; color:var(--muted); }
+
+/* HOMEPAGE: COMPACT, SIDE-BY-SIDE STORY CONTAINERS */
+.home-page main {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:stretch;
+}
+.home-page main > .hero-section,
+.home-page main > .section-wrap:first-of-type,
+.home-page main > #explore-stories,
+.home-page main > #more-stories,
+.home-page main > .section-wrap:last-of-type {
+  grid-column:1 / -1;
+}
+.home-page #recently-added,
+.home-page #popular-stories {
+  width:100%;
+  max-width:none;
+  min-width:0;
+  padding:58px clamp(16px,3vw,34px);
+  margin:0;
+  align-self:stretch;
+}
+.home-page #recently-added .section-heading,
+.home-page #popular-stories .section-heading {
+  min-height:128px;
+}
+.home-page #recently-added .story-grid,
+.home-page #popular-stories .story-grid {
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  padding:4px 2px 14px;
+  scroll-snap-type:x mandatory;
+  overscroll-behavior-x:contain;
+}
+.home-page #recently-added .story-card,
+.home-page #popular-stories .story-card {
+  flex:0 0 min(82%,260px);
+  scroll-snap-align:start;
+}
+.home-page .story-card .story-image {
+  display:block;
+  width:100%;
+  height:145px;
+  object-fit:cover;
+  border-radius:10px;
+}
+.home-page #explore-stories,
+.home-page #more-stories { min-width:0; }
+
+/* PROFILE ACTIVITY: THREE CLEAR, RESPONSIVE PANELS */
+.profile-page .member-activity {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+.profile-page .member-activity > h2 { grid-column:1 / -1; }
+.profile-page .member-activity > .profile-details {
+  min-width:0;
+  margin:0;
+  padding:18px;
+  border:1px solid var(--theme-border,#cfc3ad);
+  border-radius:14px;
+  background:var(--white,#fbf7ee);
+}
+.profile-page .member-activity-link {
+  display:block;
+  padding:9px 0;
+  border-bottom:1px solid var(--theme-border,#cfc3ad);
+  overflow-wrap:anywhere;
+}
+.profile-page .member-activity-link:last-child { border-bottom:0; }
+@media(max-width:820px) {
+  .profile-page .member-activity { grid-template-columns:1fr 1fr; }
+  .home-page #recently-added,
+  .home-page #popular-stories { padding:48px 18px; }
+}
+@media(max-width:620px) {
+  .home-page main { grid-template-columns:minmax(0,1fr); }
+  .home-page main > .hero-section,
+  .home-page main > .section-wrap:first-of-type,
+  .home-page main > #recently-added,
+  .home-page main > #popular-stories,
+  .home-page main > #explore-stories,
+  .home-page main > #more-stories,
+  .home-page main > .section-wrap:last-of-type { grid-column:1; }
+  .home-page #recently-added .section-heading,
+  .home-page #popular-stories .section-heading { min-height:0; }
+  .profile-page .member-activity { grid-template-columns:1fr; }
+}
