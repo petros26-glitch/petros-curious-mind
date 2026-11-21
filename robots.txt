@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /profile.html
+Disallow: /signin.html
+Disallow: /signup.html
+Disallow: /change-password.html
+
+Sitemap: https://petroscuriousmind.name.ng/sitemap.xml
