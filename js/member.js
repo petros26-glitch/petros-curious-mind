@@ -2,7 +2,15 @@
 (async function () {
   const client = window.PCM && window.PCM.supabase;
   if (!client) return;
-  const { data: { user } } = await client.auth.getUser();
+  let user = null;
+  try {
+    const { data, error } = await client.auth.getUser();
+    if (error) throw error;
+    user = data?.user || null;
+  } catch (error) {
+    console.error("Could not verify the signed-in member:", error);
+    return;
+  }
   if (!user) return;
 
   const escape = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({
@@ -50,7 +58,8 @@
     else if (!comments?.length) commentsTarget.textContent = "You haven't posted any comments yet.";
     else {
       const ids = [...new Set(comments.map((comment) => comment.story_id))];
-      const { data: stories } = await client.from("stories").select("id,title").in("id", ids);
+      const { data: stories, error: storyError } = await client.from("stories").select("id,title").in("id", ids);
+      if (storyError) console.error("Could not load story titles for member comments:", storyError);
       const byId = new Map((stories || []).map((story) => [story.id, story.title]));
       commentsTarget.innerHTML = "";
       comments.forEach((comment) => {
