@@ -37,7 +37,7 @@
 <form id="storyForm"><input type="hidden" id="storyId"><div class="admin-field"><label for="storyTitle">Story title</label><input id="storyTitle" maxlength="220" required></div>
 <div class="admin-field"><label for="storyExcerpt">Short description</label><textarea id="storyExcerpt" rows="3" maxlength="500"></textarea></div>
 <div class="admin-field"><label for="storyContent">Full story</label><textarea id="storyContent" required></textarea></div>
-<div class="admin-field"><label for="storyImage">Story image (JPG, PNG, WEBP or GIF; max 5 MB)</label><input id="storyImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></div>
+<div class="admin-field"><label for="storyImageUrl">Blogger image URL</label><input id="storyImageUrl" type="url" inputmode="url" placeholder="https://blogger.googleusercontent.com/..." autocomplete="url"><small>Paste the direct image URL from Blogger. The image itself will remain hosted by Blogger, not Supabase.</small></div>
 <div class="admin-checks"><label><input id="storyFeatured" type="checkbox"> Featured story</label><label><input id="storyPublished" type="checkbox"> Publish immediately</label></div>
 <button class="button button-primary" type="submit">Save Story</button> <button class="button button-outline" type="button" id="resetStoryForm">Clear Form</button><p class="admin-message" id="storyMessage" role="status"></p></form></div>
 <div class="admin-panel"><h2>All stories</h2><div id="adminStories">Loading stories…</div></div></section>
