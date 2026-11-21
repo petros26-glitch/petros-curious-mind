@@ -23,6 +23,7 @@ jobs:
       - name: Generate sitemap from published stories
         run: |
           node <<'NODE'
+          (async () => {
           const fs = require("node:fs");
           const source = fs.readFileSync("js/supabase-client.js", "utf8");
           const url = source.match(/url:\s*"([^"]+)"/)?.[1];
@@ -66,6 +67,7 @@ jobs:
           ].join("\n");
           fs.writeFileSync("sitemap.xml", body);
           console.log("Generated sitemap for " + stories.length + " published stories.");
+          })().catch((error) => { console.error(error); process.exit(1); });
           NODE
 
       - name: Commit sitemap when it changes
