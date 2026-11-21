@@ -34,7 +34,7 @@
     };
     async function loadOverview() {
       const [stories, published, pending, users] = await Promise.all([
-        count("stories"), count("stories", [["published","eq",true]]),
+        count("stories", [["deleted_at","is",null]]), count("stories", [["published","eq",true],["deleted_at","is",null]]),
         count("comments", [["status","eq","pending"]]), count("profiles")
       ]);
       document.getElementById("statStories").textContent = stories;
@@ -48,7 +48,7 @@
     async function loadStories() {
       const target = document.getElementById("adminStories");
       target.textContent = "Loading stories…";
-      const { data, error } = await c.from("stories").select("id,title,slug,published,featured,created_at").order("created_at", { ascending: false });
+      const { data, error } = await c.from("stories").select("id,title,slug,published,featured,created_at").is("deleted_at", null).order("created_at", { ascending: false });
       if (error) { target.textContent = error.message; return; }
       target.innerHTML = "";
       if (!data.length) { target.textContent = "No stories have been created yet."; return; }
@@ -62,7 +62,7 @@
         actions.append(
           makeButton("Edit", () => fillStoryForm(story.id)),
           makeButton(story.published ? "Unpublish" : "Publish", () => togglePublish(story), "button button-outline"),
-          makeButton("Delete", () => deleteStory(story), "button button-danger")
+          makeButton("Move to Trash", () => deleteStory(story), "button button-danger")
         );
         row.append(details, actions); target.appendChild(row);
       });
@@ -130,12 +130,47 @@
       await Promise.all([loadStories(), loadOverview()]);
     }
     async function deleteStory(story) {
-      if (!confirm(`Delete "${story.title}"? This also deletes its comments and likes.`)) return;
-      const { data: record } = await c.from("stories").select("image_path").eq("id", story.id).maybeSingle();
-      const { error } = await c.from("stories").delete().eq("id", story.id);
+      if (!confirm(`Move "${story.title}" to Recently Deleted? You can restore it later.`)) return;
+      const { data: { user: adminUser } } = await c.auth.getUser();
+      const { error } = await c.from("stories").update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: adminUser ? adminUser.id : null,
+        updated_at: new Date().toISOString()
+      }).eq("id", story.id).is("deleted_at", null);
       if (error) return alert(error.message);
-      if (record && record.image_path && !/^https?:\/\//i.test(record.image_path)) await c.storage.from("story-images").remove([record.image_path]);
       await Promise.all([loadStories(), loadOverview()]);
+    }
+
+    async function loadTrash() {
+      const target = document.getElementById("adminTrash");
+      target.textContent = "Loading recently deleted stories…";
+      const { data, error } = await c.from("stories")
+        .select("id,title,slug,published,deleted_at")
+        .not("deleted_at", "is", null)
+        .order("deleted_at", { ascending: false });
+      if (error) { target.textContent = error.message; return; }
+      target.innerHTML = "";
+      if (!data.length) { target.textContent = "Recently deleted stories will appear here."; return; }
+      data.forEach((story) => {
+        const row = document.createElement("article"); row.className = "admin-list-row";
+        const details = document.createElement("div");
+        const title = document.createElement("strong"); title.textContent = story.title;
+        const meta = document.createElement("small");
+        meta.textContent = (story.published ? "Was published" : "Was a draft") +
+          " · Moved to trash " + new Date(story.deleted_at).toLocaleString();
+        details.append(title, meta);
+        const actions = document.createElement("div"); actions.className = "admin-actions";
+        actions.append(makeButton("Restore", () => restoreStory(story), "button button-primary"));
+        row.append(details, actions); target.appendChild(row);
+      });
+    }
+
+    async function restoreStory(story) {
+      const { error } = await c.from("stories").update({
+        deleted_at: null, deleted_by: null, updated_at: new Date().toISOString()
+      }).eq("id", story.id).not("deleted_at", "is", null);
+      if (error) return alert(error.message);
+      await Promise.all([loadTrash(), loadStories(), loadOverview()]);
     }
     document.getElementById("storyForm").addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -241,6 +276,7 @@
       document.querySelectorAll("[data-admin-view]").forEach((b) => b.classList.toggle("active", b === button));
       document.querySelectorAll(".admin-view").forEach((section) => { section.hidden = section.id !== "view-" + button.dataset.adminView; });
       if (button.dataset.adminView === "stories") loadStories();
+      if (button.dataset.adminView === "trash") loadTrash();
       if (button.dataset.adminView === "comments") loadComments();
       if (button.dataset.adminView === "users") loadUsers();
     }));
