@@ -58,6 +58,36 @@
         if (unavailableButton) unavailableButton.disabled = true;
         return;
       }
+
+      // Guests enter their details; signed-in members get their account details filled in.
+      (async () => {
+        try {
+          const client = window.PCM.supabase;
+          const { data: { user } } = await client.auth.getUser();
+          if (!user) return;
+
+          const nameField = document.getElementById("fullName");
+          const emailField = document.getElementById("email");
+          const { data: profile } = await client
+            .from("profiles")
+            .select("display_name")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          if (nameField && !nameField.value) {
+            nameField.value = profile?.display_name || user.user_metadata?.full_name || "";
+          }
+          if (emailField && user.email) {
+            emailField.value = user.email;
+            emailField.readOnly = true;
+            emailField.setAttribute("aria-readonly", "true");
+          }
+          note.textContent = "Your account details have been filled in. You can send your message below.";
+        } catch (error) {
+          console.warn("Could not prefill member contact details:", error);
+        }
+      })();
+
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const button = form.querySelector('[type="submit"]');
