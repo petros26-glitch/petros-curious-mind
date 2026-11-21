@@ -175,6 +175,7 @@
       updateImagePreview();
       await Promise.all([loadStories(), loadOverview()]);
     });
+    document.getElementById("cancelStoryEdit").addEventListener("click", () => document.getElementById("resetStoryForm").click());
     document.getElementById("resetStoryForm").addEventListener("click", () => {
       document.getElementById("storyForm").reset();
       document.getElementById("storyId").value = "";
