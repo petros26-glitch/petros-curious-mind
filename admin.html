@@ -27,10 +27,10 @@
 <div class="admin-top" style="display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap;margin-bottom:22px">
 <div><p class="eyebrow">PRIVATE WORKSPACE</p><h1>Admin Dashboard</h1><p>Signed in as <strong id="adminIdentity"></strong></p></div><button type="button" id="adminSignOut" class="button button-outline">Sign Out</button></div>
 <div class="admin-layout"><aside class="admin-sidebar"><nav class="admin-nav" aria-label="Admin sections">
-<button class="active" data-admin-view="overview">▦ Overview</button><button data-admin-view="stories">▤ Stories</button><button data-admin-view="comments">☰ Comments</button><button data-admin-view="users">♙ Profiles</button>
+<button class="active" data-admin-view="overview">▦ Overview</button><button data-admin-view="stories">▤ Stories</button><button data-admin-view="trash">♲ Recently Deleted</button><button data-admin-view="comments">☰ Comments</button><button data-admin-view="users">♙ Profiles</button>
 </nav></aside><div class="admin-main">
 <section class="admin-view" id="view-overview"><div class="admin-stats">
-<article class="admin-stat"><strong id="statStories">—</strong><span>Total stories</span></article><article class="admin-stat"><strong id="statPublished">—</strong><span>Published stories</span></article>
+<article class="admin-stat"><strong id="statStories">—</strong><span>Active stories</span></article><article class="admin-stat"><strong id="statPublished">—</strong><span>Published stories</span></article>
 <article class="admin-stat"><strong id="statPending">—</strong><span>Pending comments</span></article><article class="admin-stat"><strong id="statUsers">—</strong><span>Reader profiles</span></article></div>
 <div class="admin-panel" style="margin-top:18px"><h2>Welcome back</h2><p>Dashboard information is loaded from Supabase. Database policies enforce administrator access even if someone opens this page directly.</p></div></section>
 <section class="admin-view" id="view-stories" hidden><div class="admin-panel"><h2 id="storyFormHeading">Add a story</h2>
@@ -41,8 +41,9 @@
 <div class="admin-checks"><label><input id="storyFeatured" type="checkbox"> Show in Popular Stories on homepage</label><label><input id="storyPublished" type="checkbox"> Publish immediately</label></div>
 <button class="button button-primary" id="storySubmitButton" type="submit">Save Story</button> <button class="button button-outline" type="button" id="cancelStoryEdit" hidden>Cancel Edit</button> <button class="button button-outline" type="button" id="resetStoryForm">Clear Form</button><p class="admin-message" id="storyMessage" role="status"></p></form></div>
 <div class="admin-panel"><h2>All stories</h2><div id="adminStories">Loading stories…</div></div></section>
+<section class="admin-view" id="view-trash" hidden><div class="admin-panel"><h2>Recently Deleted</h2><p>Stories moved here are hidden from visitors but are not permanently deleted. Restore a story to make it available again. Permanent deletion will remain unavailable until private GitHub backups are connected.</p><div id="adminTrash">Loading recently deleted stories…</div></div></section>
 <section class="admin-view" id="view-comments" hidden><div class="admin-panel"><h2>Comment moderation</h2><p>Approve or reject reader comments before they appear publicly.</p><div id="adminComments">Loading comments…</div></div></section>
 <section class="admin-view" id="view-users" hidden><div class="admin-panel"><h2>Reader profiles</h2><p>Public profile information only. Authentication credentials and private account data are not exposed here.</p><div id="adminUsers">Loading profiles…</div></div></section>
 </div></div></div></main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.1"></script><script src="js/supabase-client.js"></script><script src="js/main.js"></script><script src="js/auth.js?v=guest-member-20261121"></script><script src="js/admin.js?v=popular-control-20261121"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.1"></script><script src="js/supabase-client.js"></script><script src="js/main.js"></script><script src="js/auth.js?v=guest-member-20261121"></script><script src="js/admin.js?v=story-trash-20261121"></script>
 </body></html>
