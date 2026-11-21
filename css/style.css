@@ -2607,3 +2607,13 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
   .profile-page .settings-item .home-button,
   .profile-page .settings-item button { max-width:100%; }
 }
+
+
+/* Story search */
+.story-search-section { padding-top: 12px; padding-bottom: 18px; }
+.story-search-box { max-width: 820px; margin: 0 auto; }
+.story-search-box label { display: block; margin-bottom: 9px; font-weight: 700; color: var(--text-color, #342d24); }
+.story-search-box input { display: block; width: 100%; min-height: 54px; padding: 14px 17px; border: 1px solid #cfc3ad; border-radius: 12px; background: #fff; color: #342d24; font: inherit; box-sizing: border-box; }
+.story-search-box input:focus { outline: 3px solid rgba(104,115,75,.2); border-color: #68734b; }
+.story-search-results { margin-top: 18px; }
+.story-search-results[hidden] { display: none !important; }
