@@ -56,7 +56,7 @@
         const row = document.createElement("article"); row.className = "admin-list-row";
         const details = document.createElement("div");
         const title = document.createElement("strong"); title.textContent = story.title;
-        const meta = document.createElement("small"); meta.textContent = (story.published ? "Published" : "Draft") + (story.featured ? " · Featured" : "");
+        const meta = document.createElement("small"); meta.textContent = (story.published ? "Published" : "Draft") + (story.featured ? " · Popular on homepage" : "");
         details.append(title, meta);
         const actions = document.createElement("div"); actions.className = "admin-actions";
         actions.append(
