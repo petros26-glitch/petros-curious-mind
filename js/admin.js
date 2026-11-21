@@ -80,6 +80,37 @@
       document.getElementById("storyFormHeading").textContent = "Edit story";
       document.getElementById("storyForm").scrollIntoView({ behavior: "smooth" });
     }
+    const imageUrlInput = document.getElementById("storyImageUrl");
+    const previewWrap = document.getElementById("storyImagePreviewWrap");
+    const previewImage = document.getElementById("storyImagePreview");
+    const previewMessage = document.getElementById("storyImagePreviewMessage");
+    function isBloggerImageUrl(value) {
+      try {
+        const parsed = new URL(value);
+        return parsed.protocol === "https:" && /(blogger\\.googleusercontent\\.com|blogspot\\.com|googleusercontent\\.com)$/i.test(parsed.hostname);
+      } catch (_) { return false; }
+    }
+    function updateImagePreview() {
+      const value = imageUrlInput.value.trim();
+      previewImage.removeAttribute("src");
+      previewWrap.hidden = true;
+      if (!value) return;
+      if (!isBloggerImageUrl(value)) {
+        previewMessage.textContent = "Enter a secure direct Blogger image URL to preview it.";
+        previewWrap.hidden = false;
+        previewImage.hidden = true;
+        return;
+      }
+      previewImage.hidden = false;
+      previewMessage.textContent = "Loading image preview…";
+      previewWrap.hidden = false;
+      previewImage.onload = () => { previewMessage.textContent = "Image preview ready."; };
+      previewImage.onerror = () => { previewMessage.textContent = "The image could not be loaded. Check that the URL is a public, direct image link."; };
+      previewImage.src = value;
+    }
+    imageUrlInput.addEventListener("input", updateImagePreview);
+    imageUrlInput.addEventListener("change", updateImagePreview);
+
     function slugify(value) {
       return value.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     }
