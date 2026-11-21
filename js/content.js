@@ -69,7 +69,7 @@
     const c = client();
     if (!c) return;
     const fields = "id,title,slug,excerpt,content,image_path,featured,views,likes_count,created_at,published_at";
-    const { data, error } = await c.from("stories").select(fields).eq("published", true)
+    const { data, error } = await c.from("stories").select(fields).eq("published", true).is("deleted_at", null)
       .order("published_at", { ascending: false });
     if (error) {
       ["recentStoriesGrid", "popularStoriesGrid", "storiesGrid", "storySearchResults"].forEach((id) => {
@@ -99,7 +99,7 @@
     }
     const { data: story, error } = await c.from("stories")
       .select("id,title,slug,excerpt,content,image_path,views,published_at")
-      .eq("published", true).eq(slug ? "slug" : "id", slug || id).maybeSingle();
+      .eq("published", true).is("deleted_at", null).eq(slug ? "slug" : "id", slug || id).maybeSingle();
     if (error || !story) {
       root.textContent = "This story could not be found or is no longer available.";
       return;
