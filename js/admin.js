@@ -77,8 +77,12 @@
       document.getElementById("storyImageUrl").value = /^https?:\/\//i.test(data.image_path || "") ? data.image_path : "";
       document.getElementById("storyFeatured").checked = data.featured;
       document.getElementById("storyPublished").checked = data.published;
-      document.getElementById("storyFormHeading").textContent = "Edit story";
-      document.getElementById("storyForm").scrollIntoView({ behavior: "smooth" });
+      document.getElementById("storyFormHeading").textContent = "Editing: " + data.title;
+      document.getElementById("storySubmitButton").textContent = "Save Changes";
+      document.getElementById("cancelStoryEdit").hidden = false;
+      updateImagePreview();
+      setStatus("storyMessage", "You are editing this existing story. Saving will update it, not create another story.", false);
+      document.getElementById("storyForm").scrollIntoView({ behavior: "smooth", block: "start" });
     }
     const imageUrlInput = document.getElementById("storyImageUrl");
     const previewWrap = document.getElementById("storyImagePreviewWrap");
@@ -151,7 +155,7 @@
         try { parsedImageUrl = new URL(imageUrl); } catch (_) {
           return setStatus("storyMessage", "Enter a valid direct Blogger image URL.", true);
         }
-        if (parsedImageUrl.protocol !== "https:" || !/(blogger\.googleusercontent\.com|blogspot\.com|googleusercontent\.com)$/i.test(parsedImageUrl.hostname)) {
+        if (!isBloggerImageUrl(imageUrl)) {
           return setStatus("storyMessage", "Please use a secure direct image URL hosted by Blogger.", true);
         }
         payload.image_path = parsedImageUrl.href;
@@ -166,12 +170,18 @@
       event.target.reset();
       document.getElementById("storyId").value = "";
       document.getElementById("storyFormHeading").textContent = "Add a story";
+      document.getElementById("storySubmitButton").textContent = "Save Story";
+      document.getElementById("cancelStoryEdit").hidden = true;
+      updateImagePreview();
       await Promise.all([loadStories(), loadOverview()]);
     });
     document.getElementById("resetStoryForm").addEventListener("click", () => {
       document.getElementById("storyForm").reset();
       document.getElementById("storyId").value = "";
       document.getElementById("storyFormHeading").textContent = "Add a story";
+      document.getElementById("storySubmitButton").textContent = "Save Story";
+      document.getElementById("cancelStoryEdit").hidden = true;
+      updateImagePreview();
       setStatus("storyMessage", "", false);
     });
     async function loadComments() {
