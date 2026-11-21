@@ -78,7 +78,7 @@
       ${story.excerpt ? `<p class="story-detail-excerpt">${escapeHtml(story.excerpt)}</p>` : ""}
       <div class="story-detail-meta">Published ${story.published_at ? new Date(story.published_at).toLocaleDateString() : ""}</div>
       <div class="story-detail-content">${escapeHtml(story.content).replace(/\n/g, "<br>")}</div>
-      <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like</button><span id="likeMessage" role="status"></span></div>`;
+      <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like</button><button type="button" id="saveStory" class="button button-outline">☆ Save Story</button><span id="likeMessage" role="status"></span><span id="saveMessage" role="status"></span></div>`;
     await loadComments(c, story.id);
     const likeButton = document.getElementById("likeStory");
     const likeMessage = document.getElementById("likeMessage");
@@ -92,7 +92,7 @@
     likeButton.addEventListener("click", async () => {
       const { data: { user } } = await c.auth.getUser();
       if (!user) {
-        likeMessage.textContent = "Please sign in to like this story.";
+        likeMessage.innerHTML = 'Please <a href="signin.html">sign in</a> or <a href="signup.html">create a free account</a> to like this story.';
         return;
       }
       const { data: existing } = await c.from("likes").select("id").eq("story_id", story.id).eq("user_id", user.id).maybeSingle();
@@ -115,7 +115,7 @@
         const { data: { user } } = await c.auth.getUser();
         const msg = document.getElementById("commentMessage");
         if (!user) {
-          msg.textContent = "Please sign in before leaving a comment.";
+          msg.innerHTML = 'Please <a href="signin.html">sign in</a> or <a href="signup.html">create a free account</a> before leaving a comment.';
           return;
         }
         const input = document.getElementById("commentContent");
@@ -128,6 +128,40 @@
         }
         input.value = "";
         msg.textContent = "Your comment has been submitted and is awaiting moderation.";
+      });
+    }
+
+    const saveButton = document.getElementById("saveStory");
+    const saveMessage = document.getElementById("saveMessage");
+    if (saveButton) {
+      const { data: { user: saveUser } } = await c.auth.getUser();
+      let alreadySaved = false;
+      if (saveUser) {
+        const { data: saved } = await c.from("saved_stories").select("story_id")
+          .eq("user_id", saveUser.id).eq("story_id", story.id).maybeSingle();
+        alreadySaved = Boolean(saved);
+      }
+      saveButton.textContent = alreadySaved ? "★ Saved" : "☆ Save Story";
+      saveButton.addEventListener("click", async () => {
+        const { data: { user } } = await c.auth.getUser();
+        if (!user) {
+          saveMessage.innerHTML = 'Please <a href="signin.html">sign in</a> or <a href="signup.html">create a free account</a> to save this story.';
+          return;
+        }
+        const { data: existing } = await c.from("saved_stories").select("story_id")
+          .eq("user_id", user.id).eq("story_id", story.id).maybeSingle();
+        if (existing) {
+          const { error } = await c.from("saved_stories").delete()
+            .eq("user_id", user.id).eq("story_id", story.id);
+          if (error) return saveMessage.textContent = error.message;
+          saveButton.textContent = "☆ Save Story";
+          saveMessage.textContent = "Removed from your saved stories.";
+        } else {
+          const { error } = await c.from("saved_stories").insert({ user_id: user.id, story_id: story.id });
+          if (error) return saveMessage.textContent = error.message;
+          saveButton.textContent = "★ Saved";
+          saveMessage.textContent = "Added to your saved stories.";
+        }
       });
     }
   }
