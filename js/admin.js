@@ -46,27 +46,44 @@
       const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.className = className || "button button-outline"; b.addEventListener("click", action); return b;
     }
     async function loadStories() {
-      const target = document.getElementById("adminStories");
-      target.textContent = "Loading stories…";
-      const { data, error } = await c.from("stories").select("id,title,slug,published,featured,created_at").is("deleted_at", null).order("created_at", { ascending: false });
-      if (error) { target.textContent = error.message; return; }
-      target.innerHTML = "";
-      if (!data.length) { target.textContent = "No stories have been created yet."; return; }
-      data.forEach((story) => {
-        const row = document.createElement("article"); row.className = "admin-list-row";
-        const details = document.createElement("div");
-        const title = document.createElement("strong"); title.textContent = story.title;
-        const meta = document.createElement("small"); meta.textContent = (story.published ? "Published" : "Draft") + (story.featured ? " · Popular on homepage" : "");
-        details.append(title, meta);
-        const actions = document.createElement("div"); actions.className = "admin-actions";
-        actions.append(
-          makeButton("Edit", () => fillStoryForm(story.id)),
-          makeButton(story.featured ? "Remove from Popular" : "Add to Popular", () => togglePopular(story), "button button-outline"),
-          makeButton(story.published ? "Unpublish" : "Publish", () => togglePublish(story), "button button-outline"),
-          makeButton("Move to Trash", () => deleteStory(story), "button button-danger")
-        );
-        row.append(details, actions); target.appendChild(row);
-      });
+      const publishedTarget = document.getElementById("adminPublishedStories");
+      const draftTarget = document.getElementById("adminDraftStories");
+      publishedTarget.textContent = "Loading published stories…";
+      draftTarget.textContent = "Loading unpublished stories…";
+      const { data, error } = await c.from("stories").select("id,title,slug,published,featured,created_at")
+        .is("deleted_at", null).order("created_at", { ascending: false });
+      if (error) {
+        publishedTarget.textContent = error.message;
+        draftTarget.textContent = "Stories could not be loaded.";
+        return;
+      }
+      const publishedStories = (data || []).filter((story) => story.published);
+      const draftStories = (data || []).filter((story) => !story.published);
+      document.getElementById("publishedStoryCount").textContent = publishedStories.length;
+      document.getElementById("draftStoryCount").textContent = draftStories.length;
+      const renderStoryRows = (target, stories, emptyMessage) => {
+        target.innerHTML = "";
+        if (!stories.length) { target.textContent = emptyMessage; return; }
+        stories.forEach((story) => {
+          const row = document.createElement("article"); row.className = "admin-list-row";
+          const details = document.createElement("div");
+          const title = document.createElement("strong"); title.textContent = story.title;
+          const meta = document.createElement("small");
+          meta.textContent = (story.published ? "Published" : "Unpublished draft") +
+            (story.featured ? " · Selected for Popular Stories" : "");
+          details.append(title, meta);
+          const actions = document.createElement("div"); actions.className = "admin-actions";
+          actions.append(
+            makeButton("Edit", () => fillStoryForm(story.id)),
+            makeButton(story.featured ? "Remove from Popular" : "Add to Popular", () => togglePopular(story), "button button-outline"),
+            makeButton(story.published ? "Unpublish" : "Publish", () => togglePublish(story), "button button-outline"),
+            makeButton("Move to Trash", () => deleteStory(story), "button button-danger")
+          );
+          row.append(details, actions); target.appendChild(row);
+        });
+      };
+      renderStoryRows(publishedTarget, publishedStories, "No published stories yet.");
+      renderStoryRows(draftTarget, draftStories, "No unpublished drafts. New drafts will appear here.");
     }
     async function fillStoryForm(id) {
       const { data, error } = await c.from("stories").select("*").eq("id", id).single();
@@ -231,35 +248,66 @@
       updateImagePreview();
       setStatus("storyMessage", "", false);
     });
+    let commentFilter = "pending";
     async function loadComments() {
       const target = document.getElementById("adminComments");
       target.textContent = "Loading comments…";
-      const { data, error } = await c.from("comments").select("id,user_id,story_id,content,status,created_at").order("created_at", { ascending: false }).limit(100);
+      const { data, error } = await c.from("comments").select("id,user_id,story_id,content,status,created_at")
+        .order("created_at", { ascending: false }).limit(100);
       if (error) { target.textContent = error.message; return; }
+      const comments = data || [];
+      const counts = {
+        pending: comments.filter((item) => item.status === "pending").length,
+        approved: comments.filter((item) => item.status === "approved").length,
+        rejected: comments.filter((item) => item.status === "rejected").length,
+        all: comments.length
+      };
+      document.getElementById("commentPendingCount").textContent = counts.pending;
+      document.getElementById("commentApprovedCount").textContent = counts.approved;
+      document.getElementById("commentRejectedCount").textContent = counts.rejected;
+      document.getElementById("commentAllCount").textContent = counts.all;
+      document.querySelectorAll("[data-comment-filter]").forEach((button) => {
+        const active = button.dataset.commentFilter === commentFilter;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+      const visible = commentFilter === "all" ? comments : comments.filter((item) => item.status === commentFilter);
       target.innerHTML = "";
-      if (!data.length) { target.textContent = "No comments to moderate."; return; }
-      const userIds = [...new Set(data.map(x => x.user_id))];
-      const storyIds = [...new Set(data.map(x => x.story_id))];
-      const [{ data: profiles }, { data: stories }] = await Promise.all([
-        c.from("profiles").select("id,display_name").in("id", userIds),
-        c.from("stories").select("id,title").in("id", storyIds)
+      if (!visible.length) {
+        target.textContent = ({
+          pending: "No comments are waiting for review.",
+          approved: "No approved comments to display yet.",
+          rejected: "No rejected comments to display.",
+          all: "No comments have been submitted yet."
+        })[commentFilter] || "No comments have been submitted yet.";
+        return;
+      }
+      const userIds = [...new Set(visible.map((item) => item.user_id))];
+      const storyIds = [...new Set(visible.map((item) => item.story_id))];
+      const [{ data: profiles, error: profileError }, { data: stories, error: storyError }] = await Promise.all([
+        userIds.length ? c.from("profiles").select("id,display_name").in("id", userIds) : Promise.resolve({ data: [], error: null }),
+        storyIds.length ? c.from("stories").select("id,title").in("id", storyIds) : Promise.resolve({ data: [], error: null })
       ]);
-      const names = new Map((profiles || []).map(x => [x.id, x.display_name]));
-      const titles = new Map((stories || []).map(x => [x.id, x.title]));
-      data.forEach((item) => {
+      if (profileError || storyError) { target.textContent = "Comment details could not be loaded. Please refresh and try again."; return; }
+      const names = new Map((profiles || []).map((item) => [item.id, item.display_name]));
+      const titles = new Map((stories || []).map((item) => [item.id, item.title]));
+      visible.forEach((item) => {
         const row = document.createElement("article"); row.className = "admin-list-row";
         const details = document.createElement("div");
-        const title = document.createElement("strong"); title.textContent = (names.get(item.user_id) || "Reader") + " · " + (titles.get(item.story_id) || "Story");
+        const title = document.createElement("strong");
+        title.textContent = (names.get(item.user_id) || "Reader") + " · " + (titles.get(item.story_id) || "Story");
         const body = document.createElement("p"); body.textContent = item.content;
-        const meta = document.createElement("small"); meta.textContent = item.status + " · " + new Date(item.created_at).toLocaleString();
+        const meta = document.createElement("small");
+        meta.textContent = item.status.charAt(0).toUpperCase() + item.status.slice(1) + " · " + new Date(item.created_at).toLocaleString();
         details.append(title, body, meta);
         const actions = document.createElement("div"); actions.className = "admin-actions";
         if (item.status !== "approved") actions.append(makeButton("Approve", () => moderate(item.id, "approved")));
-        if (item.status !== "rejected") actions.append(makeButton("Reject", () => moderate(item.id, "rejected")));
+        if (item.status !== "rejected") actions.append(makeButton("Reject", () => moderate(item.id, "rejected"), "button button-outline"));
         actions.append(makeButton("Delete", async () => {
-          if (!confirm("Delete this comment?")) return;
-          const { error: e } = await c.from("comments").delete().eq("id", item.id);
-          if (e) alert(e.message); else { loadComments(); loadOverview(); }
+          if (!confirm("Delete this comment? This cannot be undone.")) return;
+          const { error: deleteError } = await c.from("comments").delete().eq("id", item.id);
+          if (deleteError) alert(deleteError.message);
+          else { await loadComments(); await loadOverview(); }
         }, "button button-danger"));
         row.append(details, actions); target.appendChild(row);
       });
@@ -283,6 +331,12 @@
         row.append(name, date); target.appendChild(row);
       });
     }
+    document.querySelectorAll("[data-comment-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        commentFilter = button.dataset.commentFilter;
+        loadComments();
+      });
+    });
     document.querySelectorAll("[data-admin-view]").forEach((button) => button.addEventListener("click", () => {
       document.querySelectorAll("[data-admin-view]").forEach((b) => b.classList.toggle("active", b === button));
       document.querySelectorAll(".admin-view").forEach((section) => { section.hidden = section.id !== "view-" + button.dataset.adminView; });
