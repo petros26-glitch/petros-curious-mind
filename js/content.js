@@ -156,7 +156,84 @@
       ${story.excerpt ? `<p class="story-detail-excerpt">${escapeHtml(story.excerpt)}</p>` : ""}
       <div class="story-detail-meta">Published ${story.published_at ? new Date(story.published_at).toLocaleDateString() : ""}</div>
       <div class="story-detail-content">${escapeHtml(story.content).replace(/\n/g, "<br>")}</div>
-      <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like</button><button type="button" id="saveStory" class="button button-outline">☆ Save Story</button><span id="likeMessage" role="status"></span><span id="saveMessage" role="status"></span></div>`;
+      <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like</button><button type="button" id="saveStory" class="button button-outline">☆ Save Story</button><span id="likeMessage" role="status"></span><span id="saveMessage" role="status"></span></div>
+      <section class="story-share" aria-label="Share this story">
+        <button type="button" id="shareStory" class="button button-primary story-share-toggle" aria-expanded="false" aria-controls="storyShareOptions">↗ Share</button>
+        <div class="story-share-options" id="storyShareOptions" hidden>
+          <p>Share this story</p>
+          <button type="button" class="button button-outline" data-share="whatsapp">WhatsApp</button>
+          <button type="button" class="button button-outline" data-share="whatsapp-business">WhatsApp Business</button>
+          <button type="button" class="button button-outline" data-share="facebook">Facebook</button>
+          <button type="button" class="button button-outline" data-share="facebook-lite">Facebook Lite</button>
+          <button type="button" class="button button-outline" id="copyStoryLink">Copy Link</button>
+          <button type="button" class="button button-outline" id="moreShareOptions">More Sharing Options</button>
+          <p class="story-share-message" id="shareMessage" role="status" aria-live="polite"></p>
+        </div>
+      </section>`;
+    const previewUrl = "https://lysfuszocmawivdlijqy.supabase.co/functions/v1/story-share?slug=" + encodeURIComponent(story.slug || story.id);
+    const shareText = story.title + "\\n\\n" + description + "\\n\\nRead this story: " + previewUrl;
+    const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareText);
+    const facebookUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(previewUrl);
+    const androidDevice = /Android/i.test(navigator.userAgent);
+    const shareToggle = document.getElementById("shareStory");
+    const shareOptions = document.getElementById("storyShareOptions");
+    const shareMessage = document.getElementById("shareMessage");
+    const showShareMessage = (message) => { if (shareMessage) shareMessage.textContent = message; };
+    shareToggle.addEventListener("click", () => {
+      const opening = shareOptions.hidden;
+      shareOptions.hidden = !opening;
+      shareToggle.setAttribute("aria-expanded", String(opening));
+    });
+    shareOptions.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-share]");
+      if (!button) return;
+      const target = button.dataset.share;
+      if (target === "whatsapp-business" && androidDevice) {
+        const intent = "intent://send?text=" + encodeURIComponent(shareText) +
+          "#Intent;scheme=whatsapp;package=com.whatsapp.w4b;S.browser_fallback_url=" +
+          encodeURIComponent(whatsappUrl) + ";end";
+        window.location.href = intent;
+      } else if (target === "facebook-lite" && androidDevice) {
+        const intent = "intent://facewebmodal/f?href=" + encodeURIComponent(facebookUrl) +
+          "#Intent;scheme=fb;package=com.facebook.lite;S.browser_fallback_url=" +
+          encodeURIComponent(facebookUrl) + ";end";
+        window.location.href = intent;
+      } else {
+        const destination = target === "facebook" || target === "facebook-lite" ? facebookUrl : whatsappUrl;
+        window.open(destination, "_blank", "noopener,noreferrer");
+      }
+    });
+    document.getElementById("copyStoryLink").addEventListener("click", async () => {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(previewUrl);
+        } else {
+          const field = document.createElement("textarea");
+          field.value = previewUrl;
+          field.style.position = "fixed";
+          field.style.opacity = "0";
+          document.body.appendChild(field);
+          field.select();
+          const copied = document.execCommand("copy");
+          field.remove();
+          if (!copied) throw new Error("Copy command unavailable");
+        }
+        showShareMessage("Story preview link copied.");
+      } catch (_) {
+        showShareMessage("Could not copy automatically. Please copy the story link from your browser.");
+      }
+    });
+    document.getElementById("moreShareOptions").addEventListener("click", async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: story.title, text: description, url: previewUrl });
+        } catch (error) {
+          if (error && error.name !== "AbortError") showShareMessage("Sharing could not be opened on this device.");
+        }
+      } else {
+        showShareMessage("Use Copy Link to share this story with another app.");
+      }
+    });
     await loadComments(c, story.id);
     const likeButton = document.getElementById("likeStory");
     const likeMessage = document.getElementById("likeMessage");
