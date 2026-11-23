@@ -90,13 +90,10 @@ function page({ title, description, image, shareUrl, destination, status = 200, 
   };
 }
 
-async function findPublishedStory(slug) {
-  if (!SUPABASE_ANON_KEY) {
-    throw new Error("SUPABASE_ANON_KEY is not configured");
-  }
+async function queryPublishedStory(field, value) {
   const params = new URLSearchParams({
     select: "id,title,slug,excerpt,content,image_path,published_at",
-    slug: "eq." + slug,
+    [field]: "eq." + value,
     published: "eq.true",
     deleted_at: "is.null",
     limit: "1"
@@ -114,6 +111,22 @@ async function findPublishedStory(slug) {
   }
   const rows = await response.json();
   return Array.isArray(rows) ? rows[0] || null : null;
+}
+
+async function findPublishedStory(slug) {
+  if (!SUPABASE_ANON_KEY) {
+    throw new Error("SUPABASE_ANON_KEY is not configured");
+  }
+  const bySlug = await queryPublishedStory("slug", slug);
+  if (bySlug) return bySlug;
+  if (/^(?:[0-9a-f]{8}-[0-9a-f-]{27}|[0-9]+)$/i.test(slug)) {
+    return queryPublishedStory("id", slug);
+  }
+  return null;
+}
+
+function isPreviewCrawler(userAgent = "") {
+  return /bot|crawler|spider|facebookexternalhit|facebot|whatsapp|twitterbot|linkedinbot|slackbot|discordbot|telegrambot|pinterest|skypeuripreview|applebot|snapchat/i.test(userAgent);
 }
 
 async function handle(req, res) {
@@ -178,6 +191,16 @@ async function handle(req, res) {
     const shareUrl = "https://petros-curious-mind-share.onrender.com/s/" + encodeURIComponent(storySlug);
     const destination = SITE_URL + "/story.html?slug=" + encodeURIComponent(storySlug);
     const description = cleanText(story.excerpt || story.content || "Discover this folklore story at Petros Curious Mind.");
+    if (!isPreviewCrawler(req.headers["user-agent"] || "")) {
+      res.writeHead(302, {
+        Location: destination,
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin"
+      });
+      return res.end();
+    }
+
     const result = page({
       title: String(story.title || "A story from Petros Curious Mind") + " | Petros Curious Mind",
       description,
