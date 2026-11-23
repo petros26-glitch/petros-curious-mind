@@ -190,14 +190,14 @@
       const target = button.dataset.share;
       if (target === "whatsapp-business" && androidDevice) {
         const intent = "intent://send?text=" + encodeURIComponent(shareText) +
-          "#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end";
+          "#Intent;scheme=whatsapp;package=com.whatsapp.w4b;S.browser_fallback_url=" +
+          encodeURIComponent(whatsappUrl) + ";end";
         window.location.href = intent;
-        window.setTimeout(() => { window.location.href = whatsappUrl; }, 900);
       } else if (target === "facebook-lite" && androidDevice) {
         const intent = "intent://facewebmodal/f?href=" + encodeURIComponent(facebookUrl) +
-          "#Intent;scheme=fb;package=com.facebook.lite;end";
+          "#Intent;scheme=fb;package=com.facebook.lite;S.browser_fallback_url=" +
+          encodeURIComponent(facebookUrl) + ";end";
         window.location.href = intent;
-        window.setTimeout(() => { window.location.href = facebookUrl; }, 900);
       } else {
         const destination = target === "facebook" ? facebookUrl : whatsappUrl;
         window.location.href = destination;
