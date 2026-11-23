@@ -1,0 +1,13 @@
+{
+  "name": "petros-curious-mind-share",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Server-rendered social sharing previews for Petros Curious Mind",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
