@@ -170,8 +170,8 @@
           <p class="story-share-message" id="shareMessage" role="status" aria-live="polite"></p>
         </div>
       </section>`;
-    const previewUrl = "https://lysfuszocmawivdlijqy.supabase.co/functions/v1/story-share?slug=" + encodeURIComponent(story.slug || story.id);
-    const shareText = story.title + "\\n\\n" + description + "\\n\\nRead this story: " + previewUrl;
+    const previewUrl = "https://lysfuszocmawivdlijqy.supabase.co/functions/v1/story-share?slug=" + encodeURIComponent(story.slug || story.id) + "&v=2";
+    const shareText = story.title + "\n\n" + description + "\n\nRead this story: " + previewUrl;
     const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareText);
     const facebookUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(previewUrl);
     const androidDevice = /Android/i.test(navigator.userAgent);
@@ -190,17 +190,17 @@
       const target = button.dataset.share;
       if (target === "whatsapp-business" && androidDevice) {
         const intent = "intent://send?text=" + encodeURIComponent(shareText) +
-          "#Intent;scheme=whatsapp;package=com.whatsapp.w4b;S.browser_fallback_url=" +
-          encodeURIComponent(whatsappUrl) + ";end";
+          "#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end";
         window.location.href = intent;
+        window.setTimeout(() => { window.location.href = whatsappUrl; }, 900);
       } else if (target === "facebook-lite" && androidDevice) {
         const intent = "intent://facewebmodal/f?href=" + encodeURIComponent(facebookUrl) +
-          "#Intent;scheme=fb;package=com.facebook.lite;S.browser_fallback_url=" +
-          encodeURIComponent(facebookUrl) + ";end";
+          "#Intent;scheme=fb;package=com.facebook.lite;end";
         window.location.href = intent;
+        window.setTimeout(() => { window.location.href = facebookUrl; }, 900);
       } else {
-        const destination = target === "facebook" || target === "facebook-lite" ? facebookUrl : whatsappUrl;
-        window.open(destination, "_blank", "noopener,noreferrer");
+        const destination = target === "facebook" ? facebookUrl : whatsappUrl;
+        window.location.href = destination;
       }
     });
     document.getElementById("copyStoryLink").addEventListener("click", async () => {
