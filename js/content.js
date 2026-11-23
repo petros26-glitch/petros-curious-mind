@@ -173,7 +173,7 @@
     const previewUrl = "https://petros-curious-mind-share.onrender.com/s/" + encodeURIComponent(story.slug || story.id);
     const shareText = story.title + "\n\n" + description + "\n\nRead this story: " + previewUrl;
     const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareText);
-    const facebookUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(previewUrl);
+    const facebookUrl = "https://m.facebook.com/sharer.php?u=" + encodeURIComponent(previewUrl);
     const androidDevice = /Android/i.test(navigator.userAgent);
     const shareToggle = document.getElementById("shareStory");
     const shareOptions = document.getElementById("storyShareOptions");
@@ -188,19 +188,20 @@
       const button = event.target.closest("[data-share]");
       if (!button) return;
       const target = button.dataset.share;
-      if (target === "whatsapp-business" && androidDevice) {
+      if (target === "whatsapp" && androidDevice) {
+        const intent = "intent://send?text=" + encodeURIComponent(shareText) +
+          "#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url=" +
+          encodeURIComponent(whatsappUrl) + ";end";
+        window.location.href = intent;
+      } else if (target === "whatsapp-business" && androidDevice) {
         const intent = "intent://send?text=" + encodeURIComponent(shareText) +
           "#Intent;scheme=whatsapp;package=com.whatsapp.w4b;S.browser_fallback_url=" +
           encodeURIComponent(whatsappUrl) + ";end";
         window.location.href = intent;
-      } else if (target === "facebook-lite" && androidDevice) {
-        const intent = "intent://facewebmodal/f?href=" + encodeURIComponent(facebookUrl) +
-          "#Intent;scheme=fb;package=com.facebook.lite;S.browser_fallback_url=" +
-          encodeURIComponent(facebookUrl) + ";end";
-        window.location.href = intent;
       } else {
-        const destination = target === "facebook" ? facebookUrl : whatsappUrl;
-        window.location.href = destination;
+        // Facebook's mobile share endpoint opens its share composer; the user must confirm the post.
+        // Avoid the app-specific facewebmodal intent, which can open Facebook without the share composer.
+        window.location.href = facebookUrl;
       }
     });
     document.getElementById("copyStoryLink").addEventListener("click", async () => {
