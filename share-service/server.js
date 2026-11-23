@@ -129,6 +129,70 @@ function isPreviewCrawler(userAgent = "") {
   return /bot|crawler|spider|facebookexternalhit|facebot|whatsapp|twitterbot|linkedinbot|slackbot|discordbot|telegrambot|pinterest|skypeuripreview|applebot|snapchat/i.test(userAgent);
 }
 
+function allowedImageHost(hostname) {
+  return hostname === "blogger.googleusercontent.com" ||
+    hostname === "lh3.googleusercontent.com" ||
+    hostname === new URL(SUPABASE_URL).hostname;
+}
+
+async function proxyStoryImage(slug, req, res) {
+  const story = await findPublishedStory(slug);
+  if (!story || !story.image_path) {
+    res.writeHead(404, { "Cache-Control": "no-store", "X-Robots-Tag": "noindex" });
+    return res.end();
+  }
+
+  const source = storyImage(story.image_path);
+  let sourceUrl;
+  try {
+    sourceUrl = new URL(source);
+  } catch {
+    res.writeHead(404, { "Cache-Control": "no-store" });
+    return res.end();
+  }
+  if (!["https:"].includes(sourceUrl.protocol) || !allowedImageHost(sourceUrl.hostname)) {
+    res.writeHead(415, { "Cache-Control": "no-store" });
+    return res.end();
+  }
+
+  const upstream = await fetch(sourceUrl, {
+    headers: { Accept: "image/avif,image/webp,image/png,image/jpeg,image/gif,*/*;q=0.5" },
+    signal: AbortSignal.timeout(12000)
+  });
+  if (!upstream.ok) {
+    res.writeHead(502, { "Cache-Control": "no-store" });
+    return res.end();
+  }
+
+  const contentType = (upstream.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
+  const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]);
+  if (!allowedTypes.has(contentType)) {
+    res.writeHead(415, { "Cache-Control": "no-store" });
+    return res.end();
+  }
+
+  const maxBytes = 12 * 1024 * 1024;
+  const declaredLength = Number(upstream.headers.get("content-length") || 0);
+  if (declaredLength > maxBytes) {
+    res.writeHead(413, { "Cache-Control": "no-store" });
+    return res.end();
+  }
+  const bytes = Buffer.from(await upstream.arrayBuffer());
+  if (!bytes.length || bytes.length > maxBytes) {
+    res.writeHead(bytes.length ? 413 : 502, { "Cache-Control": "no-store" });
+    return res.end();
+  }
+
+  res.writeHead(200, {
+    "Content-Type": contentType,
+    "Content-Length": bytes.length,
+    "Cache-Control": "public, max-age=86400, s-maxage=604800",
+    "X-Content-Type-Options": "nosniff",
+    "Access-Control-Allow-Origin": "*"
+  });
+  return res.end(req.method === "HEAD" ? undefined : bytes);
+}
+
 async function handle(req, res) {
   const requestUrl = new URL(req.url, "http://" + (req.headers.host || "localhost"));
   if (req.method !== "GET" && req.method !== "HEAD") {
@@ -139,6 +203,28 @@ async function handle(req, res) {
   if (requestUrl.pathname === "/health") {
     res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" });
     return res.end(req.method === "HEAD" ? undefined : "ok");
+  }
+
+  const imageMatch = requestUrl.pathname.match(/^\\/image\\/([^/]+)\\/?$/);
+  if (imageMatch) {
+    let imageSlug;
+    try {
+      imageSlug = decodeURIComponent(imageMatch[1]).trim();
+    } catch {
+      res.writeHead(400, { "Cache-Control": "no-store" });
+      return res.end();
+    }
+    if (!imageSlug || imageSlug.length > 200) {
+      res.writeHead(400, { "Cache-Control": "no-store" });
+      return res.end();
+    }
+    try {
+      return await proxyStoryImage(imageSlug, req, res);
+    } catch (error) {
+      console.error("Story image proxy failed:", error.message);
+      if (!res.headersSent) res.writeHead(502, { "Cache-Control": "no-store" });
+      return res.end();
+    }
   }
 
   if (requestUrl.pathname === "/" || requestUrl.pathname === "/index.html") {
@@ -204,7 +290,7 @@ async function handle(req, res) {
     const result = page({
       title: String(story.title || "A story from Petros Curious Mind") + " | Petros Curious Mind",
       description,
-      image: storyImage(story.image_path),
+      image: "https://petros-curious-mind-share.onrender.com/image/" + encodeURIComponent(storySlug),
       shareUrl,
       destination
     });
