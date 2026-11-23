@@ -61,6 +61,7 @@
         const actions = document.createElement("div"); actions.className = "admin-actions";
         actions.append(
           makeButton("Edit", () => fillStoryForm(story.id)),
+          makeButton(story.featured ? "Remove from Popular" : "Add to Popular", () => togglePopular(story), "button button-outline"),
           makeButton(story.published ? "Unpublish" : "Publish", () => togglePublish(story), "button button-outline"),
           makeButton("Move to Trash", () => deleteStory(story), "button button-danger")
         );
@@ -123,6 +124,16 @@
     function slugify(value) {
       return value.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     }
+    async function togglePopular(story) {
+      const next = !story.featured;
+      const { error } = await c.from("stories").update({
+        featured: next,
+        updated_at: new Date().toISOString()
+      }).eq("id", story.id).is("deleted_at", null);
+      if (error) return alert("Popular Stories setting could not be updated: " + error.message);
+      await loadStories();
+    }
+
     async function togglePublish(story) {
       const next = !story.published;
       const { error } = await c.from("stories").update({ published: next, published_at: next ? new Date().toISOString() : null, updated_at: new Date().toISOString() }).eq("id", story.id);
