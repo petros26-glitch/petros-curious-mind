@@ -249,68 +249,98 @@
       setStatus("storyMessage", "", false);
     });
     let commentFilter = "pending";
-    async function loadComments() {
+    let commentOffset = 0;
+    const commentPageSize = 50;
+    async function loadComments(reset = true) {
       const target = document.getElementById("adminComments");
-      target.textContent = "Loading comments…";
-      const { data, error } = await c.from("comments").select("id,user_id,story_id,content,status,created_at")
-        .order("created_at", { ascending: false }).limit(100);
-      if (error) { target.textContent = error.message; return; }
-      const comments = data || [];
-      const counts = {
-        pending: comments.filter((item) => item.status === "pending").length,
-        approved: comments.filter((item) => item.status === "approved").length,
-        rejected: comments.filter((item) => item.status === "rejected").length,
-        all: comments.length
+      const loadMoreButton = document.getElementById("loadMoreComments");
+      if (reset) {
+        commentOffset = 0;
+        target.textContent = "Loading comments…";
+        loadMoreButton.hidden = true;
+      } else {
+        loadMoreButton.disabled = true;
+        loadMoreButton.textContent = "Loading…";
+      }
+      const filters = {
+        pending: [["status", "eq", "pending"]],
+        approved: [["status", "eq", "approved"]],
+        rejected: [["status", "eq", "rejected"]],
+        all: []
       };
+      const [pendingCount, approvedCount, rejectedCount, allCount] = await Promise.all([
+        count("comments", filters.pending), count("comments", filters.approved),
+        count("comments", filters.rejected), count("comments", [])
+      ]);
+      const counts = { pending: pendingCount, approved: approvedCount, rejected: rejectedCount, all: allCount };
       document.getElementById("commentPendingCount").textContent = counts.pending;
       document.getElementById("commentApprovedCount").textContent = counts.approved;
       document.getElementById("commentRejectedCount").textContent = counts.rejected;
       document.getElementById("commentAllCount").textContent = counts.all;
-      document.querySelectorAll("[data-comment-filter]").forEach((button) => {
+      document.getElementById("loadMoreComments").addEventListener("click", () => loadComments(false));
+    document.querySelectorAll("[data-comment-filter]").forEach((button) => {
         const active = button.dataset.commentFilter === commentFilter;
         button.classList.toggle("active", active);
         button.setAttribute("aria-pressed", String(active));
       });
-      const visible = commentFilter === "all" ? comments : comments.filter((item) => item.status === commentFilter);
-      target.innerHTML = "";
-      if (!visible.length) {
+      let query = c.from("comments").select("id,user_id,story_id,content,status,created_at")
+        .order("created_at", { ascending: false }).range(commentOffset, commentOffset + commentPageSize - 1);
+      if (commentFilter !== "all") query = query.eq("status", commentFilter);
+      const { data, error } = await query;
+      loadMoreButton.disabled = false;
+      loadMoreButton.textContent = "Load more comments";
+      if (error) {
+        if (reset) target.textContent = error.message;
+        else alert("More comments could not be loaded: " + error.message);
+        return;
+      }
+      const visible = data || [];
+      if (reset) target.innerHTML = "";
+      if (!visible.length && reset) {
         target.textContent = ({
           pending: "No comments are waiting for review.",
           approved: "No approved comments to display yet.",
           rejected: "No rejected comments to display.",
           all: "No comments have been submitted yet."
         })[commentFilter] || "No comments have been submitted yet.";
-        return;
       }
-      const userIds = [...new Set(visible.map((item) => item.user_id))];
-      const storyIds = [...new Set(visible.map((item) => item.story_id))];
-      const [{ data: profiles, error: profileError }, { data: stories, error: storyError }] = await Promise.all([
-        userIds.length ? c.from("profiles").select("id,display_name").in("id", userIds) : Promise.resolve({ data: [], error: null }),
-        storyIds.length ? c.from("stories").select("id,title").in("id", storyIds) : Promise.resolve({ data: [], error: null })
-      ]);
-      if (profileError || storyError) { target.textContent = "Comment details could not be loaded. Please refresh and try again."; return; }
-      const names = new Map((profiles || []).map((item) => [item.id, item.display_name]));
-      const titles = new Map((stories || []).map((item) => [item.id, item.title]));
-      visible.forEach((item) => {
-        const row = document.createElement("article"); row.className = "admin-list-row";
-        const details = document.createElement("div");
-        const title = document.createElement("strong");
-        title.textContent = (names.get(item.user_id) || "Reader") + " · " + (titles.get(item.story_id) || "Story");
-        const body = document.createElement("p"); body.textContent = item.content;
-        const meta = document.createElement("small");
-        meta.textContent = item.status.charAt(0).toUpperCase() + item.status.slice(1) + " · " + new Date(item.created_at).toLocaleString();
-        details.append(title, body, meta);
-        const actions = document.createElement("div"); actions.className = "admin-actions";
-        if (item.status !== "approved") actions.append(makeButton("Approve", () => moderate(item.id, "approved")));
-        if (item.status !== "rejected") actions.append(makeButton("Reject", () => moderate(item.id, "rejected"), "button button-outline"));
-        actions.append(makeButton("Delete", async () => {
-          if (!confirm("Delete this comment? This cannot be undone.")) return;
-          const { error: deleteError } = await c.from("comments").delete().eq("id", item.id);
-          if (deleteError) alert(deleteError.message);
-          else { await loadComments(); await loadOverview(); }
-        }, "button button-danger"));
-        row.append(details, actions); target.appendChild(row);
-      });
+      if (visible.length) {
+        const userIds = [...new Set(visible.map((item) => item.user_id))];
+        const storyIds = [...new Set(visible.map((item) => item.story_id))];
+        const [{ data: profiles, error: profileError }, { data: stories, error: storyError }] = await Promise.all([
+          userIds.length ? c.from("profiles").select("id,display_name").in("id", userIds) : Promise.resolve({ data: [], error: null }),
+          storyIds.length ? c.from("stories").select("id,title").in("id", storyIds) : Promise.resolve({ data: [], error: null })
+        ]);
+        if (profileError || storyError) {
+          if (reset) target.textContent = "Comment details could not be loaded. Please refresh and try again.";
+          else alert("Comment details for the next page could not be loaded.");
+          return;
+        }
+        const names = new Map((profiles || []).map((item) => [item.id, item.display_name]));
+        const titles = new Map((stories || []).map((item) => [item.id, item.title]));
+        visible.forEach((item) => {
+          const row = document.createElement("article"); row.className = "admin-list-row";
+          const details = document.createElement("div");
+          const title = document.createElement("strong");
+          title.textContent = (names.get(item.user_id) || "Reader") + " · " + (titles.get(item.story_id) || "Story");
+          const body = document.createElement("p"); body.textContent = item.content;
+          const meta = document.createElement("small");
+          meta.textContent = item.status.charAt(0).toUpperCase() + item.status.slice(1) + " · " + new Date(item.created_at).toLocaleString();
+          details.append(title, body, meta);
+          const actions = document.createElement("div"); actions.className = "admin-actions";
+          if (item.status !== "approved") actions.append(makeButton("Approve", () => moderate(item.id, "approved")));
+          if (item.status !== "rejected") actions.append(makeButton("Reject", () => moderate(item.id, "rejected"), "button button-outline"));
+          actions.append(makeButton("Delete", async () => {
+            if (!confirm("Delete this comment? This cannot be undone.")) return;
+            const { error: deleteError } = await c.from("comments").delete().eq("id", item.id);
+            if (deleteError) alert(deleteError.message);
+            else { await loadComments(); await loadOverview(); }
+          }, "button button-danger"));
+          row.append(details, actions); target.appendChild(row);
+        });
+      }
+      commentOffset += visible.length;
+      loadMoreButton.hidden = visible.length < commentPageSize;
     }
     async function moderate(id, status) {
       const { error } = await c.from("comments").update({ status, updated_at: new Date().toISOString() }).eq("id", id);
