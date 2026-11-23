@@ -12,7 +12,13 @@
 .admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.admin-stat strong{display:block;font-size:28px;color:#68734b}.admin-stat span,.admin-list-row small{color:#766b5c;font-size:12px}
 .admin-field{display:grid;gap:7px;margin:13px 0}.admin-field input,.admin-field textarea{width:100%;padding:12px;border:1px solid #cfc3ad;border-radius:8px;font:inherit}.admin-field textarea{min-height:130px;resize:vertical}
 .admin-checks{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0}.admin-list-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:15px 0;border-bottom:1px solid #e0d5c3}.admin-list-row:last-child{border-bottom:0}.admin-list-row p{margin:8px 0;white-space:pre-wrap}
-.admin-actions{display:flex;gap:7px;flex-wrap:wrap}.admin-actions .button,.admin-field .button{font-size:12px;padding:8px 11px}.button-danger{background:#fbf1ed;color:#8d3e32;border:1px solid #e4c9c1}
+.admin-actions{display:flex;gap:7px;flex-wrap:wrap}
+.admin-section-heading{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.admin-count{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;background:#eee7d8;color:#465238;font-size:13px}
+.admin-comment-filters{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.admin-comment-filters .active{background:#465238;color:#fff;border-color:#465238}
+.admin-comment-filters button span{display:inline-block;min-width:18px;margin-left:5px;font-weight:700}
+.admin-comment-filters button:focus-visible,.admin-nav button:focus-visible{outline:3px solid #9aab72;outline-offset:2px}.admin-actions .button,.admin-field .button{font-size:12px;padding:8px 11px}.button-danger{background:#fbf1ed;color:#8d3e32;border:1px solid #e4c9c1}
 .admin-message{font-size:13px;min-height:18px}.is-error{color:#8d3e32}.is-success{color:#526b45}.admin-gate{max-width:600px;margin:70px auto;padding:28px;border:1px solid #e0d5c3;border-radius:14px;text-align:center}
 @media(max-width:760px){.admin-layout{grid-template-columns:1fr}.admin-sidebar{position:static}.admin-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-list-row{flex-direction:column}}
 @media(max-width:380px){.admin-stats{grid-template-columns:1fr}}
@@ -40,10 +46,16 @@
 <div class="admin-field"><label for="storyImageUrl">Blogger image URL</label><input id="storyImageUrl" type="url" inputmode="url" placeholder="https://blogger.googleusercontent.com/..." autocomplete="url"><small>Paste the direct image URL from Blogger. The image itself will remain hosted by Blogger, not Supabase.</small><div id="storyImagePreviewWrap" class="story-image-preview-wrap" hidden><img id="storyImagePreview" class="story-image-preview" alt="Story image preview"><p id="storyImagePreviewMessage" role="status">Image preview</p></div></div>
 <div class="admin-checks"><label><input id="storyFeatured" type="checkbox"> Show in Popular Stories on homepage</label><label><input id="storyPublished" type="checkbox"> Publish immediately</label></div>
 <button class="button button-primary" id="storySubmitButton" type="submit">Save Story</button> <button class="button button-outline" type="button" id="cancelStoryEdit" hidden>Cancel Edit</button> <button class="button button-outline" type="button" id="resetStoryForm">Clear Form</button><p class="admin-message" id="storyMessage" role="status"></p></form></div>
-<div class="admin-panel"><h2>All stories</h2><div id="adminStories">Loading stories…</div></div></section>
+<div class="admin-panel"><h2 class="admin-section-heading">Published Stories <span class="admin-count" id="publishedStoryCount">0</span></h2><p>Stories currently visible to readers.</p><div id="adminPublishedStories">Loading published stories…</div></div>
+<div class="admin-panel"><h2 class="admin-section-heading">Unpublished Stories <span class="admin-count" id="draftStoryCount">0</span></h2><p>Drafts saved in your dashboard and hidden from visitors.</p><div id="adminDraftStories">Loading unpublished stories…</div></div></section>
 <section class="admin-view" id="view-trash" hidden><div class="admin-panel"><h2>Recently Deleted</h2><p>Stories moved here are hidden from visitors but are not permanently deleted. Restore a story to make it available again. Permanent deletion will remain unavailable until private GitHub backups are connected.</p><div id="adminTrash">Loading recently deleted stories…</div></div></section>
-<section class="admin-view" id="view-comments" hidden><div class="admin-panel"><h2>Comment moderation</h2><p>Approve or reject reader comments before they appear publicly.</p><div id="adminComments">Loading comments…</div></div></section>
+<section class="admin-view" id="view-comments" hidden><div class="admin-panel"><h2>Comment moderation</h2><p>Approve or reject reader comments before they appear publicly.</p><div class="admin-comment-filters" role="group" aria-label="Filter comments by moderation status">
+<button type="button" class="button button-outline active" data-comment-filter="pending" aria-pressed="true">Pending <span id="commentPendingCount">0</span></button>
+<button type="button" class="button button-outline" data-comment-filter="approved" aria-pressed="false">Approved <span id="commentApprovedCount">0</span></button>
+<button type="button" class="button button-outline" data-comment-filter="rejected" aria-pressed="false">Rejected <span id="commentRejectedCount">0</span></button>
+<button type="button" class="button button-outline" data-comment-filter="all" aria-pressed="false">All <span id="commentAllCount">0</span></button>
+</div><div id="adminComments">Loading comments…</div></div></section>
 <section class="admin-view" id="view-users" hidden><div class="admin-panel"><h2>Reader profiles</h2><p>Public profile information only. Authentication credentials and private account data are not exposed here.</p><div id="adminUsers">Loading profiles…</div></div></section>
 </div></div></div></main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.1"></script><script src="js/supabase-client.js"></script><script src="js/main.js"></script><script src="js/auth.js?v=guest-member-20261121"></script><script src="js/admin.js?v=popular-toggle-20261123"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.1"></script><script src="js/supabase-client.js"></script><script src="js/main.js"></script><script src="js/auth.js?v=guest-member-20261121"></script><script src="js/admin.js?v=admin-review-layout-20261123"></script>
 </body></html>
