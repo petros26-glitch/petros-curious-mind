@@ -32,7 +32,7 @@ jobs:
           if (!url || !key) throw new Error("Could not read the Supabase public client configuration.");
 
           const response = await fetch(
-            url.replace(/\/$/, "") + "/rest/v1/stories?select=slug,published_at&published=eq.true&order=published_at.desc",
+            url.replace(/\/$/, "") + "/rest/v1/stories?select=slug,published_at&published=eq.true&deleted_at=is.null&order=published_at.desc",
             { headers: { apikey: key, Accept: "application/json" } }
           );
           const responseText = await response.text();
