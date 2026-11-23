@@ -277,8 +277,7 @@
       document.getElementById("commentApprovedCount").textContent = counts.approved;
       document.getElementById("commentRejectedCount").textContent = counts.rejected;
       document.getElementById("commentAllCount").textContent = counts.all;
-      document.getElementById("loadMoreComments").addEventListener("click", () => loadComments(false));
-    document.querySelectorAll("[data-comment-filter]").forEach((button) => {
+      document.querySelectorAll("[data-comment-filter]").forEach((button) => {
         const active = button.dataset.commentFilter === commentFilter;
         button.classList.toggle("active", active);
         button.setAttribute("aria-pressed", String(active));
@@ -361,6 +360,7 @@
         row.append(name, date); target.appendChild(row);
       });
     }
+    document.getElementById("loadMoreComments").addEventListener("click", () => loadComments(false));
     document.querySelectorAll("[data-comment-filter]").forEach((button) => {
       button.addEventListener("click", () => {
         commentFilter = button.dataset.commentFilter;
