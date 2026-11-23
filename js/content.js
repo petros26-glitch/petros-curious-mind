@@ -170,7 +170,7 @@
           <p class="story-share-message" id="shareMessage" role="status" aria-live="polite"></p>
         </div>
       </section>`;
-    const previewUrl = "https://lysfuszocmawivdlijqy.supabase.co/functions/v1/story-share?slug=" + encodeURIComponent(story.slug || story.id) + "&v=2";
+    const previewUrl = "https://petros-curious-mind-share.onrender.com/s/" + encodeURIComponent(story.slug || story.id);
     const shareText = story.title + "\n\n" + description + "\n\nRead this story: " + previewUrl;
     const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareText);
     const facebookUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(previewUrl);
