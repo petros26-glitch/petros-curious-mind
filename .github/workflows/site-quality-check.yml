@@ -8,6 +8,7 @@ on:
       - "*.html"
       - "**/*.html"
       - "css/**"
+      - "share-service/**"
       - ".github/workflows/site-quality-check.yml"
   workflow_dispatch:
 
@@ -33,6 +34,9 @@ jobs:
             echo "Checking $file"
             node --check "$file"
           done
+
+      - name: Check sharing service JavaScript syntax
+        run: npm --prefix share-service run check
 
       - name: Check HTML IDs and local links
         run: |
