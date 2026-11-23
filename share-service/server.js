@@ -205,7 +205,7 @@ async function handle(req, res) {
     return res.end(req.method === "HEAD" ? undefined : "ok");
   }
 
-  const imageMatch = requestUrl.pathname.match(/^\\/image\\/([^/]+)\\/?$/);
+  const imageMatch = requestUrl.pathname.match(/^\/image\/([^/]+)\/?$/);
   if (imageMatch) {
     let imageSlug;
     try {
