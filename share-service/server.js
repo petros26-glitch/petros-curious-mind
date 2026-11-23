@@ -5,7 +5,7 @@ const http = require("node:http");
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
 const SITE_URL = "https://petroscuriousmind.name.ng";
-const SUPABASE_URL = (process.env.SUPABASE_URL || "https://lysfuszocmawivdlijqy.supabase.co").replace(/\\/$/, "");
+const SUPABASE_URL = (process.env.SUPABASE_URL || "https://lysfuszocmawivdlijqy.supabase.co").replace(/\/$/, "");
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
 
 function escapeHtml(value) {
@@ -18,7 +18,7 @@ function cleanText(value, limit = 300) {
   return String(value ?? "")
     .replace(/<[^>]*>/g, " ")
     .replace(/&nbsp;/gi, " ")
-    .replace(/\\s+/g, " ")
+    .replace(/\s+/g, " ")
     .trim()
     .slice(0, limit);
 }
@@ -27,7 +27,7 @@ function storyImage(path) {
   const fallback = SITE_URL + "/images/logo.png";
   if (typeof path !== "string" || !path.trim()) return fallback;
   const value = path.trim();
-  if (/^https?:\\/\\//i.test(value)) {
+  if (/^https?:\/\//i.test(value)) {
     try {
       const url = new URL(value);
       return url.protocol === "https:" || url.protocol === "http:" ? url.href : fallback;
@@ -140,7 +140,7 @@ async function handle(req, res) {
     return res.end(req.method === "HEAD" ? undefined : result.body);
   }
 
-  const match = requestUrl.pathname.match(/^\\/s\\/([^/]+)\\/?$/);
+  const match = requestUrl.pathname.match(/^\/s\/([^/]+)\/?$/);
   if (!match) {
     res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex" });
     return res.end(req.method === "HEAD" ? undefined : "Not found");
