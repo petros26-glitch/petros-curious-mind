@@ -120,15 +120,6 @@
       element.setAttribute("content", value);
     };
     setMeta('meta[name="description"]', description);
-    setMeta('meta[property="og:type"]', "article");
-    setMeta('meta[property="og:site_name"]', "Petros Curious Mind");
-    setMeta('meta[property="og:title"]', story.title);
-    setMeta('meta[property="og:description"]', description);
-    setMeta('meta[property="og:url"]', pageUrl);
-    if (image) setMeta('meta[property="og:image"]', image);
-    setMeta('meta[name="twitter:card"]', image ? "summary_large_image" : "summary");
-    setMeta('meta[name="twitter:title"]', story.title);
-    setMeta('meta[name="twitter:description"]', description);
     let canonical = document.head.querySelector('link[rel="canonical"]');
     if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
     canonical.href = pageUrl;
@@ -144,7 +135,6 @@
       "@type": "Article",
       "headline": story.title,
       "description": description,
-      "image": image ? [image] : undefined,
       "datePublished": story.published_at || undefined,
       "mainEntityOfPage": { "@type": "WebPage", "@id": pageUrl },
       "publisher": { "@type": "Organization", "name": "Petros Curious Mind", "url": "https://petroscuriousmind.name.ng/" }
@@ -170,10 +160,10 @@
           <p class="story-share-message" id="shareMessage" role="status" aria-live="polite"></p>
         </div>
       </section>`;
-    const previewUrl = "https://petros-curious-mind-share.onrender.com/s/" + encodeURIComponent(story.slug || story.id);
-    const shareText = story.title + "\n\n" + description + "\n\nRead this story: " + previewUrl;
+    const storyUrl = pageUrl;
+    const shareText = story.title + "\n\n" + description + "\n\nRead this story: " + storyUrl;
     const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareText);
-    const facebookUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(previewUrl);
+    const facebookUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(storyUrl);
     const androidDevice = /Android/i.test(navigator.userAgent);
     const shareToggle = document.getElementById("shareStory");
     const shareOptions = document.getElementById("storyShareOptions");
@@ -219,10 +209,10 @@
     document.getElementById("copyStoryLink").addEventListener("click", async () => {
       try {
         if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(previewUrl);
+          await navigator.clipboard.writeText(storyUrl);
         } else {
           const field = document.createElement("textarea");
-          field.value = previewUrl;
+          field.value = storyUrl;
           field.style.position = "fixed";
           field.style.opacity = "0";
           document.body.appendChild(field);
@@ -231,7 +221,7 @@
           field.remove();
           if (!copied) throw new Error("Copy command unavailable");
         }
-        showShareMessage("Story preview link copied.");
+        showShareMessage("Story link copied.");
       } catch (_) {
         showShareMessage("Could not copy automatically. Please copy the story link from your browser.");
       }
@@ -239,7 +229,7 @@
     document.getElementById("moreShareOptions").addEventListener("click", async () => {
       if (navigator.share) {
         try {
-          await navigator.share({ title: story.title, text: description, url: previewUrl });
+          await navigator.share({ title: story.title, text: description, url: storyUrl });
         } catch (error) {
           if (error && error.name !== "AbortError") showShareMessage("Sharing could not be opened on this device.");
         }
