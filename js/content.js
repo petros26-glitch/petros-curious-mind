@@ -184,23 +184,33 @@
       shareOptions.hidden = !opening;
       shareToggle.setAttribute("aria-expanded", String(opening));
     });
+    const openAndroidShare = (packageName, text, fallbackUrl) => {
+      // Android ACTION_SEND intents target the selected app's share activity.
+      // The browser fallback is used only when that exact app is unavailable.
+      const intent = "intent:#Intent;action=android.intent.action.SEND;type=text/plain;" +
+        "package=" + packageName + ";S.android.intent.extra.TEXT=" + encodeURIComponent(text) +
+        (fallbackUrl ? ";S.browser_fallback_url=" + encodeURIComponent(fallbackUrl) : "") +
+        ";end";
+      window.location.href = intent;
+    };
     shareOptions.addEventListener("click", (event) => {
       const button = event.target.closest("[data-share]");
       if (!button) return;
       const target = button.dataset.share;
       if (target === "whatsapp" && androidDevice) {
-        const intent = "intent://send?text=" + encodeURIComponent(shareText) +
-          "#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url=" +
-          encodeURIComponent(whatsappUrl) + ";end";
-        window.location.href = intent;
+        // Do not fall back to wa.me: Android may route that generic URL to WhatsApp Business.
+        openAndroidShare("com.whatsapp", shareText, "");
       } else if (target === "whatsapp-business" && androidDevice) {
-        const intent = "intent://send?text=" + encodeURIComponent(shareText) +
-          "#Intent;scheme=whatsapp;package=com.whatsapp.w4b;S.browser_fallback_url=" +
-          encodeURIComponent(whatsappUrl) + ";end";
-        window.location.href = intent;
+        openAndroidShare("com.whatsapp.w4b", shareText, "");
+      } else if (target === "facebook" && androidDevice) {
+        openAndroidShare("com.facebook.katana", shareText, facebookUrl);
+      } else if (target === "facebook-lite" && androidDevice) {
+        openAndroidShare("com.facebook.lite", shareText, facebookUrl);
+      } else if (target === "whatsapp" || target === "whatsapp-business") {
+        // On non-Android devices, use the WhatsApp web/app share link.
+        window.location.href = whatsappUrl;
       } else {
-        // Facebook's mobile share endpoint opens its share composer; the user must confirm the post.
-        // Avoid the app-specific facewebmodal intent, which can open Facebook without the share composer.
+        // On non-Android devices, use Facebook's link-share composer.
         window.location.href = facebookUrl;
       }
     });
