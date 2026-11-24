@@ -2,7 +2,7 @@
   "name": "petros-curious-mind-share",
   "version": "1.0.0",
   "private": true,
-  "description": "Server-rendered social sharing previews for Petros Curious Mind",
+  "description": "Retired health-only endpoint for Petros Curious Mind sharing service",
   "scripts": {
     "start": "node server.js",
     "check": "node --check server.js"
