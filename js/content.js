@@ -173,7 +173,7 @@
     const previewUrl = "https://petros-curious-mind-share.onrender.com/s/" + encodeURIComponent(story.slug || story.id);
     const shareText = story.title + "\n\n" + description + "\n\nRead this story: " + previewUrl;
     const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareText);
-    const facebookUrl = "https://m.facebook.com/sharer.php?u=" + encodeURIComponent(previewUrl);
+    const facebookUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(previewUrl);
     const androidDevice = /Android/i.test(navigator.userAgent);
     const shareToggle = document.getElementById("shareStory");
     const shareOptions = document.getElementById("storyShareOptions");
@@ -184,32 +184,35 @@
       shareOptions.hidden = !opening;
       shareToggle.setAttribute("aria-expanded", String(opening));
     });
-    const openAndroidShare = (packageName, text) => {
-      // Provide a real WhatsApp deep-link URI as the intent data. An ACTION_SEND
-      // intent without a data URI can be treated as unresolved by Android browsers.
-      const intent = "intent://send/#Intent;scheme=whatsapp;package=" + packageName +
-        ";action=android.intent.action.SEND;type=text/plain;" +
-        "S.android.intent.extra.TEXT=" + encodeURIComponent(text) + ";end";
-      window.location.href = intent;
+
+    // Use the Android WhatsApp URL format with the text in the query string.
+    // The previous intent URI used ACTION_SEND without the documented send?text
+    // route, which could be treated as an unresolved app and send users to Play Store.
+    const openWhatsApp = (packageName) => {
+      const encodedText = encodeURIComponent(shareText);
+      if (androidDevice) {
+        const fallback = encodeURIComponent("https://wa.me/?text=" + encodedText);
+        window.location.href =
+          "intent://send?text=" + encodedText +
+          "#Intent;scheme=whatsapp;package=" + packageName +
+          ";S.browser_fallback_url=" + fallback + ";end";
+      } else {
+        window.location.href = whatsappUrl;
+      }
     };
+
     shareOptions.addEventListener("click", (event) => {
       const button = event.target.closest("[data-share]");
       if (!button) return;
       const target = button.dataset.share;
-      if (target === "whatsapp" && androidDevice) {
-        // Do not fall back to wa.me: Android may route that generic URL to WhatsApp Business.
-        openAndroidShare("com.whatsapp", shareText);
-      } else if (target === "whatsapp-business" && androidDevice) {
-        openAndroidShare("com.whatsapp.w4b", shareText);
-      } else if (target === "facebook" && androidDevice) {
-        openAndroidShare("com.facebook.katana", shareText);
-      } else if (target === "facebook-lite" && androidDevice) {
-        openAndroidShare("com.facebook.lite", shareText);
-      } else if (target === "whatsapp" || target === "whatsapp-business") {
-        // On non-Android devices, use the WhatsApp web/app share link.
-        window.location.href = whatsappUrl;
-      } else {
-        // On non-Android devices, use Facebook's link-share composer.
+      if (target === "whatsapp") {
+        openWhatsApp("com.whatsapp");
+      } else if (target === "whatsapp-business") {
+        openWhatsApp("com.whatsapp.w4b");
+      } else if (target === "facebook" || target === "facebook-lite") {
+        // Facebook does not provide a reliable public web deep-link that selects
+        // Facebook vs Facebook Lite. Use its official HTTPS share composer instead
+        // of a forced package intent that can open Google Play.
         window.location.href = facebookUrl;
       }
     });
