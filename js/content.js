@@ -184,13 +184,12 @@
       shareOptions.hidden = !opening;
       shareToggle.setAttribute("aria-expanded", String(opening));
     });
-    const openAndroidShare = (packageName, text, fallbackUrl) => {
-      // Android ACTION_SEND intents target the selected app's share activity.
-      // The browser fallback is used only when that exact app is unavailable.
-      const intent = "intent:#Intent;action=android.intent.action.SEND;type=text/plain;" +
-        "package=" + packageName + ";S.android.intent.extra.TEXT=" + encodeURIComponent(text) +
-        (fallbackUrl ? ";S.browser_fallback_url=" + encodeURIComponent(fallbackUrl) : "") +
-        ";end";
+    const openAndroidShare = (packageName, text) => {
+      // Provide a real WhatsApp deep-link URI as the intent data. An ACTION_SEND
+      // intent without a data URI can be treated as unresolved by Android browsers.
+      const intent = "intent://send/#Intent;scheme=whatsapp;package=" + packageName +
+        ";action=android.intent.action.SEND;type=text/plain;" +
+        "S.android.intent.extra.TEXT=" + encodeURIComponent(text) + ";end";
       window.location.href = intent;
     };
     shareOptions.addEventListener("click", (event) => {
@@ -199,13 +198,13 @@
       const target = button.dataset.share;
       if (target === "whatsapp" && androidDevice) {
         // Do not fall back to wa.me: Android may route that generic URL to WhatsApp Business.
-        openAndroidShare("com.whatsapp", shareText, "");
+        openAndroidShare("com.whatsapp", shareText);
       } else if (target === "whatsapp-business" && androidDevice) {
-        openAndroidShare("com.whatsapp.w4b", shareText, "");
+        openAndroidShare("com.whatsapp.w4b", shareText);
       } else if (target === "facebook" && androidDevice) {
-        openAndroidShare("com.facebook.katana", shareText, facebookUrl);
+        openAndroidShare("com.facebook.katana", shareText);
       } else if (target === "facebook-lite" && androidDevice) {
-        openAndroidShare("com.facebook.lite", shareText, facebookUrl);
+        openAndroidShare("com.facebook.lite", shareText);
       } else if (target === "whatsapp" || target === "whatsapp-business") {
         // On non-Android devices, use the WhatsApp web/app share link.
         window.location.href = whatsappUrl;
