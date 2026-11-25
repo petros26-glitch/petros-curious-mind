@@ -1,0 +1,23 @@
+name = "pcm-story-previews"
+main = "src/index.js"
+compatibility_date = "2026-11-25"
+workers_dev = true
+
+# These are public configuration values, not credentials.
+[vars]
+SITE_ORIGIN = "https://petroscuriousmind.name.ng"
+SITE_NAME = "Petros Curious Mind"
+SITE_DESCRIPTION = "Explore folklore, traditional storytelling, and stories passed down through generations."
+SITE_TAGLINE = "The Story Behind Every Story."
+RENDER_ORIGIN = "https://petros-curious-mind-test.onrender.com"
+SUPABASE_URL = "https://lysfuszocmawivdlijqy.supabase.co"
+HOME_IMAGE = "https://petroscuriousmind.name.ng/images/logo.png"
+
+# Routes keep Render as the origin. Do not replace these with Custom Domains.
+[[routes]]
+pattern = "petroscuriousmind.name.ng/*"
+zone_name = "petroscuriousmind.name.ng"
+
+[[routes]]
+pattern = "www.petroscuriousmind.name.ng/*"
+zone_name = "petroscuriousmind.name.ng"
