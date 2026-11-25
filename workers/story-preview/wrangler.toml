@@ -1,0 +1,25 @@
+name = "pcm-story-previews"
+main = "src/index.js"
+compatibility_date = "2026-11-25"
+workers_dev = true
+
+# Public site and API configuration. The Supabase publishable key is designed
+# for browser use and is already used by the website's public client.
+[vars]
+SITE_ORIGIN = "https://petroscuriousmind.name.ng"
+SITE_NAME = "Petros Curious Mind"
+SITE_DESCRIPTION = "Explore folklore, traditional storytelling, and stories passed down through generations."
+SITE_TAGLINE = "The Story Behind Every Story."
+RENDER_ORIGIN = "https://petros-curious-mind-test.onrender.com"
+SUPABASE_URL = "https://lysfuszocmawivdlijqy.supabase.co"
+SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cElo0TKdntMQ25tb9UqwqA_OZXzMqz2"
+HOME_IMAGE = "https://petroscuriousmind.name.ng/images/logo.png"
+
+# Routes keep Render as the origin. Do not replace these with Custom Domains.
+[[routes]]
+pattern = "petroscuriousmind.name.ng/*"
+zone_name = "petroscuriousmind.name.ng"
+
+[[routes]]
+pattern = "www.petroscuriousmind.name.ng/*"
+zone_name = "petroscuriousmind.name.ng"
