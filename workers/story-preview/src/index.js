@@ -1,9 +1,3 @@
-const HTML_HEADERS = {
-  "content-type": "text/html; charset=utf-8",
-  "cache-control": "no-store, max-age=0",
-  "x-content-type-options": "nosniff"
-};
-
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
   "&": "&amp;",
   "<": "&lt;",
@@ -22,10 +16,8 @@ function metadataMarkup(page) {
   const imageAlt = escapeHtml(page.imageAlt || page.title);
   const canonical = escapeHtml(page.url);
   const type = page.type === "article" ? "article" : "website";
-  const width = String(page.imageWidth || 1200);
-  const height = String(page.imageHeight || 630);
 
-  return [
+  const tags = [
     `<title>${title}</title>`,
     `<meta name="description" content="${description}">`,
     `<link rel="canonical" href="${canonical}">`,
@@ -34,15 +26,20 @@ function metadataMarkup(page) {
     `<meta property="og:title" content="${title}">`,
     `<meta property="og:description" content="${description}">`,
     `<meta property="og:image" content="${image}">`,
-    `<meta property="og:image:width" content="${width}">`,
-    `<meta property="og:image:height" content="${height}">`,
     `<meta property="og:image:alt" content="${imageAlt}">`,
     `<meta property="og:url" content="${canonical}">`,
     '<meta name="twitter:card" content="summary_large_image">',
     `<meta name="twitter:title" content="${title}">`,
     `<meta name="twitter:description" content="${description}">`,
     `<meta name="twitter:image" content="${image}">`
-  ].join("\n");
+  ];
+
+  // Only publish dimensions when they are known rather than guessing.
+  if (page.imageWidth && page.imageHeight) {
+    tags.push(`<meta property="og:image:width" content="${page.imageWidth}">`);
+    tags.push(`<meta property="og:image:height" content="${page.imageHeight}">`);
+  }
+  return tags.join("\n");
 }
 
 function replaceHeadMetadata(response, page) {
@@ -65,14 +62,14 @@ function replaceHeadMetadata(response, page) {
 function notFoundResponse() {
   return new Response(
     '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Story not found | Petros Curious Mind</title></head><body><main><h1>Story not found</h1><p>This story may have been unpublished or is no longer available.</p><a href="/">Return to Petros Curious Mind</a></main></body></html>',
-    { status: 404, headers: HTML_HEADERS }
+    { status: 404, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff" } }
   );
 }
 
 function unavailableResponse() {
   return new Response(
     '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Story temporarily unavailable | Petros Curious Mind</title></head><body><main><h1>Story temporarily unavailable</h1><p>Please try again shortly.</p><a href="/">Return to Petros Curious Mind</a></main></body></html>',
-    { status: 503, headers: { ...HTML_HEADERS, "retry-after": "60" } }
+    { status: 503, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "retry-after": "60", "x-content-type-options": "nosniff" } }
   );
 }
 
@@ -146,7 +143,7 @@ export default {
     const incoming = new URL(request.url);
     const pathname = incoming.pathname;
 
-    // This Worker is a transparent origin proxy for all ordinary site assets and pages.
+    // The Worker is a transparent origin proxy for normal site assets and pages.
     if (request.method !== "GET" && request.method !== "HEAD") {
       return fetchOrigin(request, env);
     }
@@ -199,7 +196,7 @@ export default {
     try {
       story = await getPublishedStory(env, slug);
     } catch {
-      // Fail closed: never guess or expose a draft when the public database lookup fails.
+      // Fail closed: never guess or expose a draft when the public lookup fails.
       return unavailableResponse();
     }
 
@@ -212,8 +209,6 @@ export default {
       description: plainText(story.excerpt || "Discover the story behind this tale.", 300),
       image,
       imageAlt: plainText(story.title, 180) + " cover image",
-      imageWidth: 1200,
-      imageHeight: 630,
       url: canonicalStoryUrl(siteOrigin, story.slug)
     };
 
