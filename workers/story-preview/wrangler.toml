@@ -1,7 +1,7 @@
 name = "pcm-story-previews"
 main = "src/index.js"
 compatibility_date = "2026-11-25"
-workers_dev = true
+workers_dev = false
 
 # Public site and API configuration. The Supabase publishable key is designed
 # for browser use and is already used by the website's public client.
