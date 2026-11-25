@@ -12,15 +12,7 @@ This Worker sits in front of the existing Render Static Site. It does not replac
 - Returns a 404 for missing/unpublished stories and a 503 if the public story lookup is temporarily unavailable.
 - Does not alter story URLs, Supabase tables, frontend JavaScript, or share buttons.
 
-## Configuration
-
-The non-secret values are in `wrangler.toml`. Set the Supabase publishable key as a Worker secret:
-
-```sh
-npx wrangler secret put SUPABASE_PUBLISHABLE_KEY
-```
-
-Paste the existing Supabase **publishable** key when prompted. Never use a service-role or secret key.
+The Supabase publishable key in `wrangler.toml` is the same browser-safe public key already used by the website. It is not a service-role key and has no admin privileges. Never replace it with a service-role or secret key.
 
 ## Deploy
 
@@ -30,7 +22,6 @@ Add these GitHub repository Actions secrets before merging/deploying:
 
 - `CLOUDFLARE_API_TOKEN`: token with permission to deploy Workers and manage Worker routes for the `petroscuriousmind.name.ng` zone.
 - `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID.
-- `SUPABASE_PUBLISHABLE_KEY`: the existing browser-safe Supabase publishable key.
 
 The first deployment creates the Worker and the two Worker routes declared in `wrangler.toml`:
 - `petroscuriousmind.name.ng/*`
@@ -38,16 +29,17 @@ The first deployment creates the Worker and the two Worker routes declared in `w
 
 Keep the existing root A and www CNAME DNS records proxied. Do not convert these routes to Custom Domains: the Worker must proxy requests to the Render origin.
 
-## Manual local checks
+## Local checks
 
 Install Node.js and Wrangler, then from this directory:
 
 ```sh
+node --check src/index.js
 npx wrangler dev
 npx wrangler deploy
 ```
 
-The live workflow is preferred for repeatable deployments. Never put API tokens or Supabase service-role keys in this folder or commit them.
+The GitHub Actions workflow is preferred for repeatable deployments. Never put API tokens or Supabase service-role keys in this folder or commit them.
 
 ## Acceptance tests
 
@@ -64,4 +56,4 @@ Social platforms cache previews independently. Use Meta Sharing Debugger or the 
 
 ## Safety and caching
 
-HTML responses are marked `no-store` so an old page-specific preview is not reused by a shared cache. Story metadata is fetched from the public Supabase REST API on each story request. Only the existing public fields needed for the preview are selected. The publishable key is a public client key, but it is stored as a Worker secret to keep configuration tidy. No privileged database credential is used.
+HTML responses are marked `no-store` so old page-specific preview metadata is not reused by a shared cache. Story metadata is fetched from the public Supabase REST API on each story request. Only the existing public fields needed for the preview are selected. No privileged database credential is used.
