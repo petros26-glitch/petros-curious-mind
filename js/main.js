@@ -1,3 +1,12 @@
+// Keep one public hostname. Preserve paths and query strings when redirecting.
+(function () {
+  if (window.location.hostname === "petroscuriousmind.name.ng") {
+    const canonicalUrl = new URL(window.location.href);
+    canonicalUrl.hostname = "www.petroscuriousmind.name.ng";
+    window.location.replace(canonicalUrl.href);
+  }
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
 
   const menuToggle = document.getElementById("menuToggle");
