@@ -23,3 +23,7 @@ zone_name = "petroscuriousmind.name.ng"
 [[routes]]
 pattern = "www.petroscuriousmind.name.ng/*"
 zone_name = "petroscuriousmind.name.ng"
+
+# Preview metadata must be generated on every request; do not serve stale HTML ahead of the Worker.
+[cache]
+enabled = false
