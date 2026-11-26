@@ -88,6 +88,8 @@ for (const item of stories) {
   const placeholder = /<article id="storyDetail" style="margin-top:25px">[\s\S]*?<\/article>/i;
   if (!placeholder.test(html)) throw new Error("Could not locate the story content placeholder in story.html.");
   html = html.replace(placeholder, article);
+  // Generated pages live one directory below the site root, so keep site assets and navigation root-relative.
+  html = html.replace(/\b(href|src)="(?!https?:\/\/|\/|#|mailto:|tel:)([^"]+)"/gi, '$1="/$2"');
 
   const directory = path.join(outputRoot, item.slug);
   fs.mkdirSync(directory, { recursive: true });
