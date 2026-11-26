@@ -50,82 +50,46 @@
     (() => {
       const form = document.getElementById("contactForm");
       const note = document.getElementById("formNote");
-      let memberContactDetails = null;
       if (!form) return;
-      if (!window.PCM?.supabase) {
-        note.textContent = "The message service could not load. Please refresh the page and try again.";
-        note.classList.add("is-error");
-        const unavailableButton = form.querySelector('[type="submit"]');
-        if (unavailableButton) unavailableButton.disabled = true;
-        return;
-      }
-
-      // Guests enter their details; signed-in members get their account details filled in.
+      const client = window.PCM?.supabase;
+      const button = form.querySelector('[type="submit"]');
+      if (!client) { note.textContent = "The message service could not load. Please refresh the page and try again."; button.disabled = true; return; }
+      button.disabled = true;
       (async () => {
-        try {
-          const client = window.PCM.supabase;
-          const { data: { user } } = await client.auth.getUser();
-          if (!user) return;
-
-          const nameField = document.getElementById("fullName");
-          const emailField = document.getElementById("email");
-          const { data: profile } = await client
-            .from("profiles")
-            .select("display_name")
-            .eq("id", user.id)
-            .maybeSingle();
-
-          if (nameField && !nameField.value) {
-            nameField.value = profile?.display_name || user.user_metadata?.full_name || "";
-          }
-          if (emailField && user.email) {
-            emailField.value = user.email;
-            emailField.readOnly = true;
-            emailField.setAttribute("aria-readonly", "true");
-          }
-          memberContactDetails = { fullName: nameField?.value || "", email: user.email || "" };
-          note.textContent = "Your account details have been filled in. You can send your message below.";
-        } catch (error) {
-          console.warn("Could not prefill member contact details:", error);
+        const { data: { user }, error } = await client.auth.getUser();
+        if (error || !user) {
+          note.textContent = "Please sign in before contacting us. Redirecting to sign in…";
+          window.location.replace("signin.html?next=contact.html");
+          return;
         }
-      })();
-
+        const { data: profile } = await client.from("profiles").select("display_name").eq("id", user.id).maybeSingle();
+        document.getElementById("fullName").value = profile?.display_name || user.user_metadata?.full_name || "";
+        const email = document.getElementById("email");
+        email.value = user.email || ""; email.readOnly = true; email.setAttribute("aria-readonly", "true");
+        note.textContent = "Your account details are ready. You can send your message below.";
+        button.disabled = false;
+      })().catch((error) => { console.error("Contact account check failed:", error); note.textContent = "We could not verify your account. Please sign in again."; button.disabled = true; });
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const button = form.querySelector('[type="submit"]');
+        const { data: { user }, error: authError } = await client.auth.getUser();
+        if (authError || !user) { window.location.replace("signin.html?next=contact.html"); return; }
         const fullName = document.getElementById("fullName").value.trim();
-        const email = document.getElementById("email").value.trim();
         const subject = document.getElementById("subject").value.trim();
         const message = document.getElementById("message").value.trim();
         const company = document.getElementById("company").value;
-        if (fullName.length < 2 || subject.length < 2 || message.length < 10) {
-          note.textContent = "Please complete each field. Your message should be at least 10 characters.";
-          note.classList.add("is-error");
-          return;
-        }
-        button.disabled = true;
-        button.textContent = "Sending message…";
-        note.classList.remove("is-error", "is-success");
-        note.textContent = "Sending your message securely…";
+        if (fullName.length < 2 || subject.length < 2 || message.length < 10) { note.textContent = "Please complete each field. Your message should be at least 10 characters."; note.classList.add("is-error"); return; }
+        button.disabled = true; button.textContent = "Sending message…"; note.textContent = "Sending your message securely…";
         try {
-          const { data, error } = await window.PCM.supabase.functions.invoke("send-contact-message", {
-            body: { fullName, email, subject, message, company }
-          });
+          const { data, error } = await client.functions.invoke("send-contact-message", { body: { fullName, subject, message, company } });
           if (error || !data?.success) throw new Error(data?.error || error?.message || "Message could not be sent.");
           form.reset();
-          if (memberContactDetails) {
-            document.getElementById("fullName").value = memberContactDetails.fullName;
-            document.getElementById("email").value = memberContactDetails.email;
-          }
-          note.textContent = "Your message has been sent. Thank you for reaching out — Curious Mind will be in touch.";
-          note.classList.add("is-success");
-        } catch (error) {
-          note.textContent = error.message || "Something went wrong. Please try again.";
-          note.classList.add("is-error");
-        } finally {
-          button.disabled = false;
-          button.innerHTML = 'Send Message <span aria-hidden="true">→</span>';
-        }
+          const { data: { user: currentUser } } = await client.auth.getUser();
+          const { data: currentProfile } = currentUser ? await client.from("profiles").select("display_name").eq("id", currentUser.id).maybeSingle() : { data: null };
+          document.getElementById("fullName").value = currentProfile?.display_name || currentUser?.user_metadata?.full_name || "";
+          const email = document.getElementById("email"); email.value = currentUser?.email || ""; email.readOnly = true;
+          note.textContent = "Your message has been sent. Thank you for reaching out — Curious Mind will be in touch."; note.classList.add("is-success");
+        } catch (error) { note.textContent = error.message || "Something went wrong. Please try again."; note.classList.add("is-error"); }
+        finally { button.disabled = false; button.innerHTML = 'Send Message <span aria-hidden="true">→</span>'; }
       });
     })();
   </script>
