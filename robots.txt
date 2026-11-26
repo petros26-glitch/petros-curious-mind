@@ -6,4 +6,4 @@ Disallow: /signin.html
 Disallow: /signup.html
 Disallow: /change-password.html
 
-Sitemap: https://petroscuriousmind.name.ng/sitemap.xml
+Sitemap: https://www.petroscuriousmind.name.ng/sitemap.xml
