@@ -70,7 +70,7 @@ jobs:
                   return response.status, response.headers, response.read()
 
           def check_page(label, path, expected_title=None, require_story_image=False):
-              url = SITE + path
+              url = path if path.startswith("https://") else SITE + path
               print(f"\nChecking {label}: {url}")
               try:
                   status, headers, body = fetch(url)
@@ -136,6 +136,8 @@ jobs:
 
           check_page("Homepage", "/", "Petros Curious Mind")
           check_page("WWW homepage route probe", "https://www.petroscuriousmind.name.ng/", "Petros Curious Mind")
+          check_page("Direct Worker homepage probe", "https://pcm-story-previews.petroscuriousmind1.workers.dev/", "Petros Curious Mind")
+          check_page("Direct Worker story probe", "https://pcm-story-previews.petroscuriousmind1.workers.dev/story.html?slug=the-woman-in-the-woods-c261fe", "THE WOMAN IN THE WOODS", True)
           check_page("The Woman in the Woods", "/story.html?slug=the-woman-in-the-woods-c261fe", "THE WOMAN IN THE WOODS", True)
           check_page("The Eradication of Dragons", "/story.html?slug=the-eradication-of-dragons-3a060b", "THE ERADICATION OF DRAGONS", True)
 
