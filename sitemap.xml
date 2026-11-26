@@ -21,6 +21,10 @@
     <priority>0.2</priority>
   </url>
   <url>
+    <loc>https://petroscuriousmind.name.ng/cookies.html</loc>
+    <priority>0.2</priority>
+  </url>
+  <url>
     <loc>https://petroscuriousmind.name.ng/terms.html</loc>
     <priority>0.2</priority>
   </url>
