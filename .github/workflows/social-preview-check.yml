@@ -31,11 +31,16 @@ jobs:
           from urllib.request import Request, urlopen
           from urllib.error import HTTPError, URLError
           from urllib.parse import urljoin
-          import sys, time
+          import sys, time, socket
 
           SITE = "https://petroscuriousmind.name.ng"
           USER_AGENT = "facebookexternalhit/1.1 (+https://www.facebook.com/externalhit_uatext.php)"
           failures = []
+          for host in ("petroscuriousmind.name.ng", "www.petroscuriousmind.name.ng"):
+              try:
+                  print(f"DNS {host}: {sorted(set(socket.gethostbyname_ex(host)[2]))}")
+              except Exception as exc:
+                  print(f"DNS {host}: lookup failed: {exc}")
 
           class MetaParser(HTMLParser):
               def __init__(self):
