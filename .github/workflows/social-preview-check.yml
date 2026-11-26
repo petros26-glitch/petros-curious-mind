@@ -31,7 +31,7 @@ jobs:
           from urllib.request import Request, urlopen
           from urllib.error import HTTPError, URLError
           from urllib.parse import urljoin
-          import sys
+          import sys, time
 
           SITE = "https://petroscuriousmind.name.ng"
           USER_AGENT = "facebookexternalhit/1.1 (+https://www.facebook.com/externalhit_uatext.php)"
@@ -65,7 +65,7 @@ jobs:
                       self.in_title = False
 
           def fetch(url, headers=None):
-              req = Request(url, headers={"User-Agent": USER_AGENT, **(headers or {})})
+              req = Request(url, headers={"User-Agent": USER_AGENT, "Cache-Control": "no-cache", "Pragma": "no-cache", **(headers or {})})
               with urlopen(req, timeout=20) as response:
                   return response.status, response.headers, response.read()
 
