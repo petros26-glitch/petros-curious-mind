@@ -28,6 +28,10 @@ const imageUrl = (value) => {
   const encodedPath = String(value).split("/").map(encodeURIComponent).join("/");
   return supabaseUrl.replace(/\/$/, "") + "/storage/v1/object/public/story-images/" + encodedPath;
 };
+// Use Blogger's own resized rendition for social cards. This is the same story cover,
+// served at a smaller size for crawlers; the full-resolution cover remains on the page.
+const socialImageUrl = (value) => String(value || logoUrl)
+  .replace(/\/s\d+\//i, "/s600/");
 const setMeta = (html, attribute, name, value) => {
   const escaped = escapeHtml(value);
   const pattern = new RegExp("<meta\\s+" + attribute + "=\"" + name + "\"\\s+content=\"[^\"]*\"\\s*/?>", "i");
@@ -56,6 +60,7 @@ for (const item of stories) {
   const title = plainText(item.title);
   const description = (plainText(item.excerpt) || plainText(item.content) || "Read this folklore story at Petros Curious Mind.").slice(0, 300);
   const cover = imageUrl(item.image_path);
+  const socialCover = socialImageUrl(cover);
   const pageUrl = base + "/stories/" + item.slug + "/";
   if (!title || !cover || !/^https:\/\//i.test(cover)) throw new Error("Invalid metadata or cover image for slug: " + item.slug);
 
@@ -65,12 +70,15 @@ for (const item of stories) {
   html = setMeta(html, "name", "description", description);
   html = setMeta(html, "property", "og:title", title);
   html = setMeta(html, "property", "og:description", description);
-  html = setMeta(html, "property", "og:image", cover);
+  html = setMeta(html, "property", "og:image", socialCover);
+  html = setMeta(html, "property", "og:image:secure_url", socialCover);
+  html = setMeta(html, "property", "og:image:alt", title);
   html = setMeta(html, "property", "og:url", pageUrl);
   html = setMeta(html, "property", "og:type", "article");
   html = setMeta(html, "name", "twitter:title", title);
   html = setMeta(html, "name", "twitter:description", description);
-  html = setMeta(html, "name", "twitter:image", cover);
+  html = setMeta(html, "name", "twitter:image", socialCover);
+  html = setMeta(html, "name", "twitter:image:alt", title);
 
   const publishedDate = item.published_at ? new Date(item.published_at).toLocaleDateString("en-GB", {
     day: "numeric", month: "long", year: "numeric", timeZone: "UTC"
