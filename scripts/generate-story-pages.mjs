@@ -30,7 +30,7 @@ const imageUrl = (value) => {
 };
 const setMeta = (html, attribute, name, value) => {
   const escaped = escapeHtml(value);
-  const pattern = new RegExp("<meta\\\\s+" + attribute + "=\"" + name + "\"\\\\s+content=\"[^\"]*\"\\\\s*/?>", "i");
+  const pattern = new RegExp("<meta\\s+" + attribute + "=\"" + name + "\"\\s+content=\"[^\"]*\"\\s*/?>", "i");
   if (!pattern.test(html)) throw new Error("Missing metadata placeholder: " + name);
   return html.replace(pattern, "<meta " + attribute + "=\"" + name + "\" content=\"" + escaped + "\">");
 };
