@@ -7,7 +7,7 @@ const publishableKey = source.match(/publishableKey:\s*"([^"]+)"/)?.[1];
 if (!supabaseUrl || !publishableKey) throw new Error("Could not read the public Supabase client configuration.");
 
 const response = await fetch(
-  supabaseUrl.replace(/\/$/, "") + "/rest/v1/stories?select=id,title,slug,excerpt,content,image_path,published_at&published=eq.true&deleted_at=is.null&order=published_at.desc&limit=1000",
+  supabaseUrl.replace(/\/$/, "") + "/rest/v1/stories?select=id,title,slug,excerpt,content,image_path,published_at,updated_at&published=eq.true&deleted_at=is.null&order=published_at.desc&limit=1000",
   { headers: { apikey: publishableKey, Authorization: "Bearer " + publishableKey, Accept: "application/json" } }
 );
 const responseBody = await response.text();
@@ -80,6 +80,26 @@ for (const item of stories) {
   html = setMeta(html, "name", "twitter:image", socialCover);
   html = setMeta(html, "name", "twitter:image:alt", title);
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": pageUrl },
+    "headline": title,
+    "description": description,
+    "image": [socialCover],
+    "datePublished": item.published_at || undefined,
+    "dateModified": item.updated_at || item.published_at || undefined,
+    "author": { "@type": "Organization", "name": "Petros Curious Mind", "url": base + "/" },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Petros Curious Mind",
+      "logo": { "@type": "ImageObject", "url": logoUrl }
+    }
+  };
+  html = html.replace("</head>", '<script type="application/ld+json">' +
+    JSON.stringify(structuredData).replace(/</g, "\\u003c") +
+    "</script>\\n</head>");
+
   const publishedDate = item.published_at ? new Date(item.published_at).toLocaleDateString("en-GB", {
     day: "numeric", month: "long", year: "numeric", timeZone: "UTC"
   }) : "";
@@ -104,7 +124,7 @@ for (const item of stories) {
   fs.writeFileSync(path.join(directory, "index.html"), html, "utf8");
   sitemapEntries.push({
     loc: pageUrl,
-    lastmod: item.published_at ? new Date(item.published_at).toISOString().slice(0, 10) : undefined,
+    lastmod: (item.updated_at || item.published_at) ? new Date(item.updated_at || item.published_at).toISOString().slice(0, 10) : undefined,
     priority: "0.8"
   });
 }
