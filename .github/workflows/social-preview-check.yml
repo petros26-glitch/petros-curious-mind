@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Check live homepage and story previews as a social crawler
         env:
-          SITE: https://petroscuriousmind.name.ng
+          SITE: https://www.petroscuriousmind.name.ng
         run: |
           python3 <<'PY'
           from html.parser import HTMLParser
@@ -33,7 +33,7 @@ jobs:
           from urllib.parse import urljoin
           import sys, time, socket
 
-          SITE = "https://petroscuriousmind.name.ng"
+          SITE = "https://www.petroscuriousmind.name.ng"
           USER_AGENT = "facebookexternalhit/1.1 (+https://www.facebook.com/externalhit_uatext.php)"
           failures = []
           for host in ("petroscuriousmind.name.ng", "www.petroscuriousmind.name.ng"):
