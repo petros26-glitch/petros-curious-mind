@@ -105,26 +105,18 @@
       return;
     }
     const image = imageUrl(story.image_path);
-    // Use the hostname whose Cloudflare Worker route reliably serves server-rendered social metadata.
-    // The visible page remains on its current host; canonical/share links use the working www route.
-    const shareOrigin = "https://www.petroscuriousmind.name.ng";
-    const pageUrl = shareOrigin + "/story.html?slug=" + encodeURIComponent(story.slug || story.id);
+    const pageUrl = window.location.href;
     document.title = story.title + " | Petros Curious Mind";
     const description = (story.excerpt || story.content || "Read this folklore story at Petros Curious Mind.")
       .replace(/\s+/g, " ").trim().slice(0, 300);
-    const setMeta = (selector, value) => {
-      let element = document.head.querySelector(selector);
-      if (!element) {
-        element = document.createElement("meta");
-        const match = selector.match(/(name|property)="([^"]+)"/);
-        if (match) element.setAttribute(match[1], match[2]);
-        document.head.appendChild(element);
-      }
-      element.setAttribute("content", value);
-    };
-    setMeta('meta[name="description"]', description);
+    const descriptionMeta = document.head.querySelector('meta[name="description"]');
+    if (descriptionMeta) descriptionMeta.content = description;
     let canonical = document.head.querySelector('link[rel="canonical"]');
-    if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
     canonical.href = pageUrl;
     let structuredData = document.getElementById("storyStructuredData");
     if (!structuredData) {
@@ -150,20 +142,130 @@
       <div class="story-detail-meta">Published ${story.published_at ? new Date(story.published_at).toLocaleDateString() : ""}</div>
       <div class="story-detail-content">${escapeHtml(story.content).replace(/\n/g, "<br>")}</div>
       <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like</button><button type="button" id="saveStory" class="button button-outline">☆ Save Story</button><span id="likeMessage" role="status"></span><span id="saveMessage" role="status"></span></div>
-      <section class="story-share" aria-label="Share this story">
-        <button type="button" id="shareStory" class="button button-primary story-share-toggle" aria-expanded="false" aria-controls="storyShareOptions">↗ Share</button>
-        <div class="story-share-options" id="storyShareOptions" hidden>
-          <p>Share this story</p>
-          <button type="button" class="button button-outline" data-share="whatsapp">WhatsApp</button>
-          <button type="button" class="button button-outline" data-share="whatsapp-business">WhatsApp Business</button>
-          <button type="button" class="button button-outline" data-share="facebook">Facebook</button>
-          <button type="button" class="button button-outline" data-share="facebook-lite">Facebook Lite</button>
-          <button type="button" class="button button-outline" id="copyStoryLink">Copy Link</button>
-          <button type="button" class="button button-outline" id="moreShareOptions">More Sharing Options</button>
-          <p class="story-share-message" id="shareMessage" role="status" aria-live="polite"></p>
-        </div>
-      </section>`;
+`;
     const storyUrl = pageUrl;
+    await loadComments(c, story.id);
+    const likeButton = document.getElementById("likeStory");
+    const likeMessage = document.getElementById("likeMessage");
+    const { data: { user: currentReader } } = await c.auth.getUser();
+    let alreadyLiked = false;
+    if (currentReader) {
+      const { data: ownLike } = await c.from("likes").select("id").eq("story_id", story.id).eq("user_id", currentReader.id).maybeSingle();
+      alreadyLiked = Boolean(ownLike);
+    }
+    likeButton.textContent = alreadyLiked ? "♥ Liked" : "♡ Like";
+    likeButton.addEventListener("click", async () => {
+      const { data: { user } } = await c.auth.getUser();
+      if (!user) {
+        likeMessage.innerHTML = 'Please <a href="signin.html">sign in</a> or <a href="signup.html">create a free account</a> to like this story.';
+        return;
+      }
+      const { data: existing } = await c.from("likes").select("id").eq("story_id", story.id).eq("user_id", user.id).maybeSingle();
+      if (existing) {
+        const { error: removeError } = await c.from("likes").delete().eq("id", existing.id);
+        if (removeError) return likeMessage.textContent = removeError.message;
+        likeButton.textContent = "♡ Like";
+        likeMessage.textContent = "Like removed.";
+      } else {
+        const { error: addError } = await c.from("likes").insert({ story_id: story.id, user_id: user.id });
+        if (addError) return likeMessage.textContent = addError.message;
+        likeButton.textContent = "♥ Liked";
+        likeMessage.textContent = "You liked this story.";
+      }
+    });
+    const form = document.getElementById("commentForm");
+    if (form) {
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const { data: { user } } = await c.auth.getUser();
+        const msg = document.getElementById("commentMessage");
+        if (!user) {
+          msg.innerHTML = 'Please <a href="signin.html">sign in</a> or <a href="signup.html">create a free account</a> before leaving a comment.';
+          return;
+        }
+        const input = document.getElementById("commentContent");
+        const value = input.value.trim();
+        if (!value) return;
+        const { error: addError } = await c.from("comments").insert({ story_id: story.id, user_id: user.id, content: value, status: "pending" });
+        if (addError) {
+          msg.textContent = addError.message;
+          return;
+        }
+        input.value = "";
+        msg.textContent = "Your comment has been submitted and is awaiting moderation.";
+      });
+    }
+
+    const saveButton = document.getElementById("saveStory");
+    const saveMessage = document.getElementById("saveMessage");
+    if (saveButton) {
+      const { data: { user: saveUser } } = await c.auth.getUser();
+      let alreadySaved = false;
+      if (saveUser) {
+        const { data: saved } = await c.from("saved_stories").select("story_id")
+          .eq("user_id", saveUser.id).eq("story_id", story.id).maybeSingle();
+        alreadySaved = Boolean(saved);
+      }
+      saveButton.textContent = alreadySaved ? "★ Saved" : "☆ Save Story";
+      saveButton.addEventListener("click", async () => {
+        const { data: { user } } = await c.auth.getUser();
+        if (!user) {
+          saveMessage.innerHTML = 'Please <a href="signin.html">sign in</a> or <a href="signup.html">create a free account</a> to save this story.';
+          return;
+        }
+        const { data: existing } = await c.from("saved_stories").select("story_id")
+          .eq("user_id", user.id).eq("story_id", story.id).maybeSingle();
+        if (existing) {
+          const { error } = await c.from("saved_stories").delete()
+            .eq("user_id", user.id).eq("story_id", story.id);
+          if (error) return saveMessage.textContent = error.message;
+          saveButton.textContent = "☆ Save Story";
+          saveMessage.textContent = "Removed from your saved stories.";
+        } else {
+          const { error } = await c.from("saved_stories").insert({ user_id: user.id, story_id: story.id });
+          if (error) return saveMessage.textContent = error.message;
+          saveButton.textContent = "★ Saved";
+          saveMessage.textContent = "Added to your saved stories.";
+        }
+      });
+    }
+  }
+
+  async function loadComments(c, storyId) {
+    const target = document.getElementById("storyComments");
+    if (!target) return;
+    const { data, error } = await c.from("comments").select("id,user_id,content,created_at").eq("story_id", storyId).eq("status", "approved").order("created_at", { ascending: false });
+    if (error) {
+      target.textContent = "Comments could not be loaded.";
+      return;
+    }
+    if (!data || !data.length) {
+      target.textContent = "No comments yet. Be the first to join the conversation.";
+      return;
+    }
+    const ids = [...new Set(data.map((item) => item.user_id))];
+    const { data: profiles } = await c.from("profiles").select("id,display_name").in("id", ids);
+    const names = new Map((profiles || []).map((p) => [p.id, p.display_name]));
+    target.innerHTML = "";
+    data.forEach((item) => {
+      const entry = document.createElement("article");
+      entry.className = "comment-item";
+      const author = document.createElement("strong");
+      author.textContent = names.get(item.user_id) || "Reader";
+      const body = document.createElement("p");
+      body.textContent = item.content;
+      const date = document.createElement("small");
+      date.textContent = new Date(item.created_at).toLocaleDateString();
+      entry.append(author, date, body);
+      target.appendChild(entry);
+    });
+  }
+
+  ready(() => {
+    loadPublicStories();
+    loadStoryPage();
+  });
+})();
     const shareText = story.title + "\n\n" + description + "\n\nRead this story: " + storyUrl;
     const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareText);
     const facebookUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(storyUrl);
