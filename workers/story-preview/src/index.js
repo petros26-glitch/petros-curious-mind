@@ -221,13 +221,16 @@ export default {
     if (!story) return withPreviewDiagnostics(notFoundResponse(), "story-not-found");
 
     const image = isSafeImageUrl(story.image_path) ? story.image_path : fallbackImage;
+    const canonicalOrigin = incoming.hostname === "www.petroscuriousmind.name.ng"
+      ? incoming.origin
+      : siteOrigin;
     const page = {
       type: "article",
       title: plainText(story.title, 180) + " | " + env.SITE_NAME,
       description: plainText(story.excerpt || "Discover the story behind this tale.", 300),
       image,
       imageAlt: plainText(story.title, 180) + " cover image",
-      url: canonicalStoryUrl(siteOrigin, story.slug)
+      url: canonicalStoryUrl(canonicalOrigin, story.slug)
     };
 
     const response = replaceHeadMetadata(originResponse, page);
