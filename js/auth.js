@@ -173,7 +173,9 @@
         submit.textContent = "Sign In →";
         if (error) return setMessage(message, error.message, true);
         setMessage(message, "Signed in successfully. Opening your account…", false);
-        window.location.href = "index.html";
+        const requestedNext = new URLSearchParams(window.location.search).get("next");
+        const safeNext = requestedNext && /^[a-z0-9-]+\\.html$/i.test(requestedNext) ? requestedNext : "index.html";
+        window.location.href = safeNext;
       });
     }
 
