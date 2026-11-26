@@ -1,6 +1,10 @@
 name: Social preview checks
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/social-preview-check.yml"
   workflow_dispatch:
   schedule:
     - cron: "17 */6 * * *"
