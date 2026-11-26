@@ -143,6 +143,7 @@ jobs:
 
           check_page("Homepage", "/", "Petros Curious Mind")
           check_page("WWW homepage route probe", "https://www.petroscuriousmind.name.ng/", "Petros Curious Mind")
+          check_page("WWW story route probe", "https://www.petroscuriousmind.name.ng/story.html?slug=the-woman-in-the-woods-c261fe", "THE WOMAN IN THE WOODS", True)
           check_page("Direct Worker homepage probe", "https://pcm-story-previews.petroscuriousmind1.workers.dev/", "Petros Curious Mind")
           check_page("Direct Worker story probe", "https://pcm-story-previews.petroscuriousmind1.workers.dev/story.html?slug=the-woman-in-the-woods-c261fe", "THE WOMAN IN THE WOODS", True)
           check_page("The Woman in the Woods", "/story.html?slug=the-woman-in-the-woods-c261fe", "THE WOMAN IN THE WOODS", True)
