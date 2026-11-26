@@ -98,7 +98,7 @@ for (const item of stories) {
   };
   html = html.replace("</head>", '<script type="application/ld+json">' +
     JSON.stringify(structuredData).replace(/</g, "\\u003c") +
-    "</script>\\n</head>");
+    "</script>\n</head>");
 
   const publishedDate = item.published_at ? new Date(item.published_at).toLocaleDateString("en-GB", {
     day: "numeric", month: "long", year: "numeric", timeZone: "UTC"
