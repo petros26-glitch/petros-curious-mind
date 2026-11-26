@@ -95,6 +95,10 @@ jobs:
               print(f"HTTP: {status}")
               print(f"x-pcm-worker: {headers.get('x-pcm-worker', '')}")
               print(f"x-pcm-preview: {headers.get('x-pcm-preview', '')}")
+              print(f"server: {headers.get('Server', '')}")
+              print(f"cf-ray: {headers.get('CF-Ray', '')}")
+              print(f"cf-cache-status: {headers.get('CF-Cache-Status', '')}")
+              print(f"cf-worker: {headers.get('CF-Worker', '')}")
               print(f"content-type: {headers.get('Content-Type', '')}")
               print(f"og:title: {title}")
               print(f"og:image: {image}")
@@ -131,6 +135,7 @@ jobs:
                       failures.append(f"{label}: og:image could not be fetched: {exc}")
 
           check_page("Homepage", "/", "Petros Curious Mind")
+          check_page("WWW homepage route probe", "https://www.petroscuriousmind.name.ng/", "Petros Curious Mind")
           check_page("The Woman in the Woods", "/story.html?slug=the-woman-in-the-woods-c261fe", "THE WOMAN IN THE WOODS", True)
           check_page("The Eradication of Dragons", "/story.html?slug=the-eradication-of-dragons-3a060b", "THE ERADICATION OF DRAGONS", True)
 
