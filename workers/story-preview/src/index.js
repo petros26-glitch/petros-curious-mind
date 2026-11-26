@@ -59,6 +59,17 @@ function replaceHeadMetadata(response, page) {
   return rewriter.transform(response);
 }
 
+function withPreviewDiagnostics(response, previewStatus) {
+  const headers = new Headers(response.headers);
+  headers.set("x-pcm-worker", "pcm-story-previews");
+  headers.set("x-pcm-preview", previewStatus);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
 function notFoundResponse() {
   return new Response(
     '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Story not found | Petros Curious Mind</title></head><body><main><h1>Story not found</h1><p>This story may have been unpublished or is no longer available.</p><a href="/">Return to Petros Curious Mind</a></main></body></html>',
@@ -152,7 +163,8 @@ export default {
     const isStory = pathname === "/story.html";
 
     if (!isHome && !isStory) {
-      return fetchOrigin(request, env);
+      const originResponse = await fetchOrigin(request, env);
+      return withPreviewDiagnostics(originResponse, "origin-pass-through");
     }
 
     let originResponse;
@@ -165,8 +177,11 @@ export default {
       });
     }
 
-    if (!originResponse.ok || !originResponse.headers.get("content-type")?.includes("text/html")) {
-      return originResponse;
+    if (!originResponse.ok) {
+      return withPreviewDiagnostics(originResponse, "origin-http-" + originResponse.status);
+    }
+    if (!originResponse.headers.get("content-type")?.toLowerCase().includes("text/html")) {
+      return withPreviewDiagnostics(originResponse, "origin-not-html");
     }
 
     const siteOrigin = (env.SITE_ORIGIN || "https://petroscuriousmind.name.ng").replace(/\/$/, "");
@@ -186,21 +201,24 @@ export default {
       const response = replaceHeadMetadata(originResponse, page);
       const headers = new Headers(response.headers);
       headers.set("cache-control", "no-store, max-age=0");
-      return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+      return withPreviewDiagnostics(
+        new Response(response.body, { status: response.status, statusText: response.statusText, headers }),
+        "homepage-injected"
+      );
     }
 
     const slug = incoming.searchParams.get("slug")?.trim();
-    if (!slug || slug.length > 200) return notFoundResponse();
+    if (!slug || slug.length > 200) return withPreviewDiagnostics(notFoundResponse(), "story-missing-slug");
 
     let story;
     try {
       story = await getPublishedStory(env, slug);
     } catch {
       // Fail closed: never guess or expose a draft when the public lookup fails.
-      return unavailableResponse();
+      return withPreviewDiagnostics(unavailableResponse(), "story-supabase-error");
     }
 
-    if (!story) return notFoundResponse();
+    if (!story) return withPreviewDiagnostics(notFoundResponse(), "story-not-found");
 
     const image = isSafeImageUrl(story.image_path) ? story.image_path : fallbackImage;
     const page = {
@@ -215,6 +233,9 @@ export default {
     const response = replaceHeadMetadata(originResponse, page);
     const headers = new Headers(response.headers);
     headers.set("cache-control", "no-store, max-age=0");
-    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+    return withPreviewDiagnostics(
+      new Response(response.body, { status: response.status, statusText: response.statusText, headers }),
+      "story-injected"
+    );
   }
 };
