@@ -71,6 +71,8 @@ jobs:
 
           def check_page(label, path, expected_title=None, require_story_image=False):
               url = path if path.startswith("https://") else SITE + path
+              separator = "&" if "?" in url else "?"
+              url += separator + "pcm_cache_bust=" + str(time.time_ns())
               print(f"\nChecking {label}: {url}")
               try:
                   status, headers, body = fetch(url)
