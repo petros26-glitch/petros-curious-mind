@@ -152,6 +152,12 @@ async function fetchOrigin(request, env) {
 export default {
   async fetch(request, env) {
     const incoming = new URL(request.url);
+    // canonical-host-redirect: use www for every public URL and preserve path/query.
+    if (incoming.hostname === "petroscuriousmind.name.ng") {
+      const canonicalUrl = new URL(request.url);
+      canonicalUrl.hostname = "www.petroscuriousmind.name.ng";
+      return Response.redirect(canonicalUrl.toString(), 301);
+    }
     const pathname = incoming.pathname;
 
     // The Worker is a transparent origin proxy for normal site assets and pages.
