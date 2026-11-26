@@ -52,6 +52,7 @@ const sitemapEntries = [
   { loc: base + "/about.html", priority: "0.5" },
   { loc: base + "/contact.html", priority: "0.4" },
   { loc: base + "/privacy.html", priority: "0.2" },
+  { loc: base + "/cookies.html", priority: "0.2" },
   { loc: base + "/terms.html", priority: "0.2" }
 ];
 
