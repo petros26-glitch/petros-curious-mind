@@ -22,7 +22,7 @@
         <span class="story-category">Folklore</span>
         <h3>${escapeHtml(story.title)}</h3>
         <p>${escapeHtml(story.excerpt || "Discover the story behind this tale.")}</p>
-        <a class="read-story" href="story.html?slug=${encodeURIComponent(story.slug || story.id)}">Read Story</a>
+        <a class="read-story" href="stories/${encodeURIComponent(story.slug || story.id)}/">Read Story</a>
       </div>`;
     return article;
   };
@@ -92,7 +92,7 @@
     if (!c || !root) return;
     const params = new URLSearchParams(location.search);
     const id = params.get("id");
-    const slug = params.get("slug");
+    const slug = params.get("slug") || root.dataset.storySlug;
     if (!id && !slug) {
       root.textContent = "This story link is incomplete.";
       return;
