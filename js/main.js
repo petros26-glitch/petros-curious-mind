@@ -256,6 +256,15 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem(KEY, JSON.stringify(consent));
       if (!consent.preferences) localStorage.removeItem("pcm-visitor-preferences");
     } catch (error) {}
+    if (consent.preferences) {
+      const root = document.documentElement;
+      try {
+        localStorage.setItem("pcm-visitor-preferences", JSON.stringify({
+          mode: root.dataset.pcmMode === "dark" ? "dark" : "light",
+          theme: ["olive", "forest", "terracotta", "wine", "charcoal"].includes(root.dataset.pcmTheme) ? root.dataset.pcmTheme : "olive"
+        }));
+      } catch (error) {}
+    }
     window.dispatchEvent(new CustomEvent("pcm:consent-changed", { detail: consent }));
     return consent;
   }
