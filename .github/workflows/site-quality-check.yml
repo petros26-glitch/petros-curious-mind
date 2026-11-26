@@ -9,6 +9,7 @@ on:
       - "**/*.html"
       - "css/**"
       - "share-service/**"
+      - "scripts/**"
       - ".github/workflows/site-quality-check.yml"
   workflow_dispatch:
 
@@ -34,6 +35,9 @@ jobs:
             echo "Checking $file"
             node --check "$file"
           done
+
+      - name: Check story page generator syntax
+        run: node --check scripts/generate-story-pages.mjs
 
       - name: Check sharing service JavaScript syntax
         run: npm --prefix share-service run check
