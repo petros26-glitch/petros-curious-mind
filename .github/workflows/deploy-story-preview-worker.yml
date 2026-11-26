@@ -14,11 +14,26 @@ jobs:
   remove-worker:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Remove Cloudflare Worker and its configured routes
-        working-directory: workers/story-preview
+      - name: Remove Cloudflare Worker routes and script
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@4 delete --name pcm-story-previews --force --config wrangler.toml
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
+          zone_json=$(curl --fail-with-body --silent --show-error "${auth[@]}" "https://api.cloudflare.com/client/v4/zones?name=petroscuriousmind.name.ng&status=active")
+          zone_id=$(printf '%s' "$zone_json" | jq -r '.result[0].id // empty')
+          if [ -z "$zone_id" ]; then
+            echo "Could not find the active Cloudflare zone."
+            exit 1
+          fi
+          routes_json=$(curl --fail-with-body --silent --show-error "${auth[@]}" "https://api.cloudflare.com/client/v4/zones/$zone_id/workers/routes")
+          route_ids=$(printf '%s' "$routes_json" | jq -r '.result[] | select(.script == "pcm-story-previews") | .id')
+          while IFS= read -r route_id; do
+            [ -z "$route_id" ] && continue
+            curl --fail-with-body --silent --show-error -X DELETE "${auth[@]}" "https://api.cloudflare.com/client/v4/zones/$zone_id/workers/routes/$route_id"
+            echo "Removed Worker route $route_id"
+          done <<< "$route_ids"
+          curl --fail-with-body --silent --show-error -X DELETE "${auth[@]}" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/pcm-story-previews"
+          echo "Removed Worker script pcm-story-previews"
