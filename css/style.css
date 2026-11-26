@@ -2630,3 +2630,25 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 #shareStoryMessage{min-height:1.4em;margin:10px 0 0;font-size:14px}
 :root[data-pcm-mode="dark"] .story-share{background:#172033;border-color:#344158}
 @media(max-width:480px){.story-share{padding:16px}.story-share-actions .button{flex:1 1 42%;min-width:0}}
+
+/* Cookie consent and preferences */
+.cookie-consent-banner,.cookie-settings-panel{position:fixed;z-index:9999;left:16px;right:16px;bottom:16px;max-width:760px;margin:0 auto;padding:20px;background:#fbf7ee;color:#302a22;border:1px solid #cfc3ad;border-radius:16px;box-shadow:0 12px 42px rgba(0,0,0,.24)}
+.cookie-consent-banner[hidden],.cookie-settings-panel[hidden]{display:none!important}
+.cookie-consent-banner h2,.cookie-settings-panel h2{margin:0 0 8px;font-size:20px;color:#302a22}
+.cookie-consent-banner p,.cookie-settings-panel p{margin:0 0 12px;line-height:1.6;color:#51483d;font-size:14px}
+.cookie-consent-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.cookie-consent-actions button,.cookie-settings-panel button{min-height:42px;padding:9px 14px;border-radius:9px;border:1px solid #68734b;font:inherit;font-weight:700;cursor:pointer}
+.cookie-consent-actions .cookie-primary,.cookie-settings-panel .cookie-primary{background:#465238;color:#fff}
+.cookie-consent-actions .cookie-secondary,.cookie-settings-panel .cookie-secondary{background:transparent;color:#34402a}
+.cookie-settings-panel{max-height:min(80vh,650px);overflow:auto}
+.cookie-setting-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid #d9d0c2}
+.cookie-setting-row strong{display:block}.cookie-setting-row small{display:block;color:#655b4e;line-height:1.5;margin-top:3px}
+.cookie-setting-row input{width:20px;height:20px;flex:0 0 auto}
+.cookie-consent-banner a,.cookie-settings-panel a{color:#465238;text-decoration:underline}
+:root[data-pcm-mode="dark"] .cookie-consent-banner,:root[data-pcm-mode="dark"] .cookie-settings-panel{background:#1f2937;color:#f3f4f6;border-color:#526176}
+:root[data-pcm-mode="dark"] .cookie-consent-banner h2,:root[data-pcm-mode="dark"] .cookie-settings-panel h2,:root[data-pcm-mode="dark"] .cookie-consent-banner p,:root[data-pcm-mode="dark"] .cookie-settings-panel p{color:#f3f4f6}
+:root[data-pcm-mode="dark"] .cookie-setting-row{border-color:#526176}
+:root[data-pcm-mode="dark"] .cookie-setting-row small{color:#d5dbe4}
+:root[data-pcm-mode="dark"] .cookie-consent-banner a,:root[data-pcm-mode="dark"] .cookie-settings-panel a{color:#f4d99f}
+.cookie-policy-actions{margin:18px 0}
+@media(max-width:520px){.cookie-consent-banner,.cookie-settings-panel{left:10px;right:10px;bottom:10px;padding:16px}.cookie-consent-actions button{flex:1 1 100%}}
