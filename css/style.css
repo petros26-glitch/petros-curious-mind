@@ -2653,6 +2653,6 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 .cookie-policy-actions{margin:18px 0}
 @media(max-width:520px){.cookie-consent-banner,.cookie-settings-panel{left:10px;right:10px;bottom:10px;padding:16px}.cookie-consent-actions button{flex:1 1 100%}}
 
-.cookie-manage-button{position:fixed;z-index:9998;left:14px;bottom:14px;min-height:38px;padding:8px 12px;border:1px solid #68734b;border-radius:9px;background:#fbf7ee;color:#34402a;font:600 13px inherit;box-shadow:0 3px 14px rgba(0,0,0,.16);cursor:pointer}
+.cookie-manage-button{position:fixed;z-index:9998;left:14px;bottom:14px;min-height:38px;padding:8px 12px;border:1px solid #68734b;border-radius:9px;background:#fbf7ee;color:#34402a;font:600 13px sans-serif;box-shadow:0 3px 14px rgba(0,0,0,.16);cursor:pointer}
 .cookie-manage-button[hidden]{display:none!important}
 :root[data-pcm-mode="dark"] .cookie-manage-button{background:#1f2937;color:#f3f4f6;border-color:#64748b}
