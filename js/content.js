@@ -105,7 +105,10 @@
       return;
     }
     const image = imageUrl(story.image_path);
-    const pageUrl = location.origin + location.pathname + "?slug=" + encodeURIComponent(story.slug || story.id);
+    // Use the hostname whose Cloudflare Worker route reliably serves server-rendered social metadata.
+    // The visible page remains on its current host; canonical/share links use the working www route.
+    const shareOrigin = "https://www.petroscuriousmind.name.ng";
+    const pageUrl = shareOrigin + "/story.html?slug=" + encodeURIComponent(story.slug || story.id);
     document.title = story.title + " | Petros Curious Mind";
     const description = (story.excerpt || story.content || "Read this folklore story at Petros Curious Mind.")
       .replace(/\s+/g, " ").trim().slice(0, 300);
