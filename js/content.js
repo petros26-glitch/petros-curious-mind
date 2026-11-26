@@ -6,6 +6,24 @@
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   }[ch]));
+
+  const storyShareUrl = (story) => new URL("stories/" + encodeURIComponent(story.slug || story.id) + "/", window.location.origin + "/").href;
+  const shareStory = async (title, url) => {
+    const shareData = { title: title + " | Petros Curious Mind", text: "Read this story on Petros Curious Mind:", url };
+    if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
+      try { await navigator.share(shareData); return; }
+      catch (error) { if (error && error.name === "AbortError") return; }
+    }
+    window.open("https://wa.me/?text=" + encodeURIComponent(shareData.text + " " + url), "_blank", "noopener,noreferrer");
+  };
+  const shareLinks = (title, url) => {
+    const text = encodeURIComponent(title + " | Petros Curious Mind " + url);
+    return {
+      whatsapp: "https://wa.me/?text=" + text,
+      facebook: "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url)
+    };
+  };
+
   const imageUrl = (path) => {
     if (!path) return "";
     if (/^https?:\/\//i.test(path)) return path;
@@ -22,7 +40,7 @@
         <span class="story-category">Folklore</span>
         <h3>${escapeHtml(story.title)}</h3>
         <p>${escapeHtml(story.excerpt || "Discover the story behind this tale.")}</p>
-        <a class="read-story" href="stories/${encodeURIComponent(story.slug || story.id)}/">Read Story</a>
+        <div class="story-card-actions"><a class="read-story" href="stories/${encodeURIComponent(story.slug || story.id)}/">Read Story</a><button class="button button-outline story-share-button" type="button" data-share-title="${escapeHtml(story.title)}" data-share-url="${escapeHtml(storyShareUrl(story))}">Share</button></div>
       </div>`;
     return article;
   };
@@ -141,8 +159,32 @@
       ${story.excerpt ? `<p class="story-detail-excerpt">${escapeHtml(story.excerpt)}</p>` : ""}
       <div class="story-detail-meta">Published ${story.published_at ? new Date(story.published_at).toLocaleDateString() : ""}</div>
       <div class="story-detail-content">${escapeHtml(story.content).replace(/\n/g, "<br>")}</div>
+      <section class="story-share" aria-label="Share this story"><h2>Share this story</h2><p>Choose an app to share this story. WhatsApp Business and Facebook Lite may appear in your phone’s share menu if installed.</p><div class="story-share-actions"><button type="button" class="button button-primary" id="nativeShareStory">Share with an app</button><a class="button button-outline" id="whatsappShareStory" target="_blank" rel="noopener noreferrer">WhatsApp</a><a class="button button-outline" id="facebookShareStory" target="_blank" rel="noopener noreferrer">Facebook</a><button type="button" class="button button-outline" id="copyShareStory">Copy link</button></div><p id="shareStoryMessage" role="status" aria-live="polite"></p></section>
       <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like</button><button type="button" id="saveStory" class="button button-outline">☆ Save Story</button><span id="likeMessage" role="status"></span><span id="saveMessage" role="status"></span></div>
 `;
+
+    document.querySelectorAll(".story-share-button").forEach((button) => {
+      button.addEventListener("click", () => shareStory(button.dataset.shareTitle || "A story", button.dataset.shareUrl));
+    });
+    const detailShareUrl = new URL("/stories/" + encodeURIComponent(story.slug || story.id) + "/", window.location.origin).href;
+    const detailShareLinks = shareLinks(story.title, detailShareUrl);
+    const nativeShareButton = document.getElementById("nativeShareStory");
+    const whatsappShareButton = document.getElementById("whatsappShareStory");
+    const facebookShareButton = document.getElementById("facebookShareStory");
+    const copyShareButton = document.getElementById("copyShareStory");
+    const shareStoryMessage = document.getElementById("shareStoryMessage");
+    if (nativeShareButton) nativeShareButton.addEventListener("click", () => shareStory(story.title, detailShareUrl));
+    if (whatsappShareButton) whatsappShareButton.href = detailShareLinks.whatsapp;
+    if (facebookShareButton) facebookShareButton.href = detailShareLinks.facebook;
+    if (copyShareButton) copyShareButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(detailShareUrl);
+        shareStoryMessage.textContent = "Story link copied.";
+      } catch (_) {
+        shareStoryMessage.textContent = "Copy is unavailable in this browser. Use Share with an app instead.";
+      }
+    });
+
     await loadComments(c, story.id);
     const likeButton = document.getElementById("likeStory");
     const likeMessage = document.getElementById("likeMessage");
