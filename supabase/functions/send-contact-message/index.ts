@@ -41,7 +41,7 @@ Deno.serve(async (req: Request) => {
       try {
         const parsed = JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") || "{}");
         anonKey = typeof parsed.default === "string" ? parsed.default : null;
-      } catch { anonKey = null; }
+      } catch { anonKey = undefined; }
     }
     if (!supabaseUrl || !anonKey) return json({ error: "Account verification is temporarily unavailable." }, 503, headers);
 
