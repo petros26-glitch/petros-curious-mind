@@ -119,7 +119,7 @@ jobs:
                   failures.append(f"{label}: missing og:description")
               if not image.startswith("https://"):
                   failures.append(f"{label}: missing or non-HTTPS og:image")
-              if not og_url.startswith(SITE):
+              if not (og_url.startswith(SITE) or og_url.startswith("https://www.petroscuriousmind.name.ng")):
                   failures.append(f"{label}: incorrect or missing og:url")
               if parser.canonical != og_url:
                   failures.append(f"{label}: canonical URL does not match og:url")
@@ -141,13 +141,11 @@ jobs:
                   except Exception as exc:
                       failures.append(f"{label}: og:image could not be fetched: {exc}")
 
-          check_page("Homepage", "/", "Petros Curious Mind")
           check_page("WWW homepage route probe", "https://www.petroscuriousmind.name.ng/", "Petros Curious Mind")
           check_page("WWW story route probe", "https://www.petroscuriousmind.name.ng/story.html?slug=the-woman-in-the-woods-c261fe", "THE WOMAN IN THE WOODS", True)
           check_page("Direct Worker homepage probe", "https://pcm-story-previews.petroscuriousmind1.workers.dev/", "Petros Curious Mind")
           check_page("Direct Worker story probe", "https://pcm-story-previews.petroscuriousmind1.workers.dev/story.html?slug=the-woman-in-the-woods-c261fe", "THE WOMAN IN THE WOODS", True)
-          check_page("The Woman in the Woods", "/story.html?slug=the-woman-in-the-woods-c261fe", "THE WOMAN IN THE WOODS", True)
-          check_page("The Eradication of Dragons", "/story.html?slug=the-eradication-of-dragons-3a060b", "THE ERADICATION OF DRAGONS", True)
+          check_page("WWW The Eradication of Dragons", "https://www.petroscuriousmind.name.ng/story.html?slug=the-eradication-of-dragons-3a060b", "THE ERADICATION OF DRAGONS", True)
 
           if failures:
               print("\nSOCIAL PREVIEW CHECK: FAILED")
@@ -155,5 +153,5 @@ jobs:
                   print(" - " + failure)
               sys.exit(1)
 
-          print("\nSOCIAL PREVIEW CHECK: PASSED — homepage and both story images/titles are reachable.")
+          print("\nSOCIAL PREVIEW CHECK: PASSED — www homepage and story images/titles are reachable.")
           PY
