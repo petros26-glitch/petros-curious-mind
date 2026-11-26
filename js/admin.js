@@ -180,6 +180,12 @@
         updated_at: new Date().toISOString()
       }).eq("id", story.id).is("deleted_at", null);
       if (error) return alert(error.message);
+      let message = "Story moved to Recently Deleted.";
+      if (story.published) {
+        try { await requestStoryPageBuild(); message += " Public story pages and the sitemap are refreshing."; }
+        catch (buildError) { message += " The automatic page refresh could not be started: " + (buildError.message || "Unknown error"); }
+      }
+      alert(message);
       await Promise.all([loadStories(), loadOverview()]);
     }
 
@@ -229,6 +235,12 @@
         deleted_at: null, deleted_by: null, updated_at: new Date().toISOString()
       }).eq("id", story.id).not("deleted_at", "is", null);
       if (error) return alert(error.message);
+      let message = "Story restored.";
+      if (story.published) {
+        try { await requestStoryPageBuild(); message += " Public story pages and the sitemap are refreshing."; }
+        catch (buildError) { message += " The automatic page refresh could not be started: " + (buildError.message || "Unknown error"); }
+      }
+      alert(message);
       await Promise.all([loadTrash(), loadStories(), loadOverview()]);
     }
     document.getElementById("storyForm").addEventListener("submit", async (event) => {
@@ -243,7 +255,7 @@
       const { data: { user: currentUser } } = await c.auth.getUser();
       let existingStory = null;
       if (id) {
-        const { data, error } = await c.from("stories").select("published_at").eq("id", id).single();
+        const { data, error } = await c.from("stories").select("published_at,published").eq("id", id).single();
         if (error) return setStatus("storyMessage", "The existing publication date could not be checked: " + error.message, true);
         existingStory = data;
       }
@@ -268,7 +280,7 @@
       else result = await c.from("stories").insert({ ...payload, created_by: currentUser.id });
       if (result.error) return setStatus("storyMessage", result.error.message, true);
       let saveMessage = id ? "Story updated." : "Story created.";
-      if (published) {
+      if (published || existingStory?.published) {
         try {
           await requestStoryPageBuild();
           saveMessage += " Static story pages are being refreshed now.";
