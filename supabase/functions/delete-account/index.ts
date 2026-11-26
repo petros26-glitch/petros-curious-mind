@@ -40,7 +40,7 @@ Deno.serve(async (req: Request) => {
         try {
           const parsed = JSON.parse(publishableKeys);
           anonKey = typeof parsed.default === "string" ? parsed.default : null;
-        } catch { anonKey = null; }
+        } catch { anonKey = undefined; }
       }
     }
     let serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -50,7 +50,7 @@ Deno.serve(async (req: Request) => {
         try {
           const parsed = JSON.parse(secretKeys);
           serviceKey = typeof parsed.default === "string" ? parsed.default : null;
-        } catch { serviceKey = null; }
+        } catch { serviceKey = undefined; }
       }
     }
     if (!supabaseUrl || !anonKey || !serviceKey) {
