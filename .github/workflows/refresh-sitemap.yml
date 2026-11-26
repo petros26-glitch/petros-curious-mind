@@ -1,85 +1,49 @@
-name: Refresh public story sitemap
+name: Generate static story pages and sitemap
 
 on:
   schedule:
-    - cron: "23 3 * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
   push:
     branches: [main]
     paths:
+      - "index.html"
+      - "story.html"
+      - "js/content.js"
       - "js/supabase-client.js"
-      - "supabase/migrations/**"
+      - "scripts/generate-story-pages.mjs"
       - ".github/workflows/refresh-sitemap.yml"
 
 permissions:
   contents: write
 
+concurrency:
+  group: generate-static-story-pages-main
+  cancel-in-progress: false
+
 jobs:
-  refresh-sitemap:
+  generate:
     runs-on: ubuntu-latest
     steps:
       - name: Check out website
         uses: actions/checkout@v4
 
-      - name: Generate sitemap from published stories
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate static story pages and sitemap
+        run: node scripts/generate-story-pages.mjs
+
+      - name: Commit generated pages when changed
         run: |
-          node <<'NODE'
-          (async () => {
-          const fs = require("node:fs");
-          const source = fs.readFileSync("js/supabase-client.js", "utf8");
-          const url = source.match(/url:\s*"([^"]+)"/)?.[1];
-          const key = source.match(/publishableKey:\s*"([^"]+)"/)?.[1];
-          if (!url || !key) throw new Error("Could not read the Supabase public client configuration.");
-
-          const response = await fetch(
-            url.replace(/\/$/, "") + "/rest/v1/stories?select=slug,published_at&published=eq.true&deleted_at=is.null&order=published_at.desc",
-            { headers: { apikey: key, Accept: "application/json" } }
-          );
-          const responseText = await response.text();
-          if (!response.ok) throw new Error("Supabase returned HTTP " + response.status + ": " + responseText);
-          const stories = JSON.parse(responseText);
-
-          const base = "https://petroscuriousmind.name.ng";
-          const urls = [
-            { loc: base + "/", priority: "1.0" },
-            { loc: base + "/stories.html", priority: "0.9" },
-            { loc: base + "/about.html", priority: "0.5" },
-            { loc: base + "/contact.html", priority: "0.4" },
-            { loc: base + "/privacy.html", priority: "0.2" },
-            { loc: base + "/terms.html", priority: "0.2" },
-            ...stories.filter((story) => story.slug).map((story) => ({
-              loc: base + "/story.html?slug=" + encodeURIComponent(story.slug),
-              lastmod: story.published_at ? new Date(story.published_at).toISOString().slice(0, 10) : undefined,
-              priority: "0.8"
-            }))
-          ];
-          const xml = (value) => String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
-          const body = [
-            '<?xml version="1.0" encoding="UTF-8"?>',
-            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-            ...urls.map((item) => [
-              "  <url>",
-              "    <loc>" + xml(item.loc) + "</loc>",
-              item.lastmod ? "    <lastmod>" + xml(item.lastmod) + "</lastmod>" : "",
-              "    <priority>" + item.priority + "</priority>",
-              "  </url>"
-            ].filter(Boolean).join("\n")),
-            "</urlset>",
-            ""
-          ].join("\n");
-          fs.writeFileSync("sitemap.xml", body);
-          console.log("Generated sitemap for " + stories.length + " published stories.");
-          })().catch((error) => { console.error(error); process.exit(1); });
-          NODE
-
-      - name: Commit sitemap when it changes
-        run: |
-          if git diff --quiet -- sitemap.xml; then
-            echo "Sitemap is already up to date."
+          git add -A -- stories sitemap.xml
+          if git diff --cached --quiet; then
+            echo "Static story pages and sitemap are already up to date."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add sitemap.xml
-          git commit -m "Refresh sitemap with published stories"
+          git commit -m "Generate static story preview pages"
           git push
