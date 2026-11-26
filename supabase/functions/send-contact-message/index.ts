@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const allowedOrigins = new Set([
   "https://petroscuriousmind.name.ng",
@@ -33,19 +34,40 @@ Deno.serve(async (req: Request) => {
   try {
     const contentLength = Number(req.headers.get("content-length") || 0);
     if (contentLength > 16000) return json({ error: "Message is too large." }, 413, headers);
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    let anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!anonKey) {
+      try {
+        const parsed = JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") || "{}");
+        anonKey = typeof parsed.default === "string" ? parsed.default : null;
+      } catch { anonKey = null; }
+    }
+    if (!supabaseUrl || !anonKey) return json({ error: "Account verification is temporarily unavailable." }, 503, headers);
+
+    const authorization = req.headers.get("Authorization") || "";
+    if (!authorization.startsWith("Bearer ")) return json({ error: "Please sign in before sending a message." }, 401, headers);
+    const token = authorization.slice(7).trim();
+    if (!token) return json({ error: "Please sign in before sending a message." }, 401, headers);
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: "Bearer " + token } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: { user }, error: userError } = await userClient.auth.getUser(token);
+    if (userError || !user?.email) return json({ error: "Your session could not be verified. Please sign in again." }, 401, headers);
+
     const body = await req.json();
     const name = typeof body.fullName === "string" ? body.fullName.trim() : "";
-    const email = typeof body.email === "string" ? body.email.trim() : "";
+    const email = user.email;
     const subject = typeof body.subject === "string" ? body.subject.trim() : "";
     const message = typeof body.message === "string" ? body.message.trim() : "";
     const honeypot = typeof body.company === "string" ? body.company.trim() : "";
     if (honeypot) return json({ success: true }, 200, headers);
     if (name.length < 2 || name.length > 80) return json({ error: "Enter a name between 2 and 80 characters." }, 400, headers);
-    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: "Enter a valid email address." }, 400, headers);
     if (subject.length < 2 || subject.length > 120) return json({ error: "Enter a subject between 2 and 120 characters." }, 400, headers);
     if (message.length < 10 || message.length > 5000) return json({ error: "Your message must be between 10 and 5,000 characters." }, 400, headers);
 
-    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || user.id;
     const now = Date.now();
     const recent = (recentRequests.get(clientIp) || []).filter((time) => now - time < 600000);
     if (recent.length >= 3) return json({ error: "Please wait a few minutes before sending another message." }, 429, headers);
@@ -64,14 +86,14 @@ Deno.serve(async (req: Request) => {
     const safeMessage = escapeHtml(message).replace(/\r?\n/g, "<br>");
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+      headers: { Authorization: "Bearer " + resendKey, "Content-Type": "application/json" },
       body: JSON.stringify({
         from: fromEmail,
         to: ["petroscuriousmind1@gmail.com"],
         reply_to: email,
-        subject: `Website message: ${subject}`,
-        html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#342d24;background:#f7f1e5;padding:24px"><div style="max-width:620px;margin:auto;background:#fbf7ee;border:1px solid #ded2bd;border-radius:12px;padding:28px"><p style="color:#68734b;font-weight:bold;letter-spacing:1px">PETROS CURIOUS MIND · NEW MESSAGE</p><h2>${safeSubject}</h2><p><strong>From:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><hr style="border:0;border-top:1px solid #ded2bd;margin:22px 0"><p style="line-height:1.7">${safeMessage}</p></div></body></html>`,
-        text: `New website message\n\nFrom: ${name}\nEmail: ${email}\nSubject: ${subject}\n\n${message}`,
+        subject: "Website message: " + subject,
+        html: '<!doctype html><html><body style="font-family:Arial,sans-serif;color:#342d24;background:#f7f1e5;padding:24px"><div style="max-width:620px;margin:auto;background:#fbf7ee;border:1px solid #ded2bd;border-radius:12px;padding:28px"><p style="color:#68734b;font-weight:bold;letter-spacing:1px">PETROS CURIOUS MIND · NEW MESSAGE</p><h2>' + safeSubject + '</h2><p><strong>From:</strong> ' + safeName + '</p><p><strong>Email:</strong> ' + safeEmail + '</p><hr style="border:0;border-top:1px solid #ded2bd;margin:22px 0"><p style="line-height:1.7">' + safeMessage + '</p></div></body></html>',
+        text: "New website message\n\nFrom: " + name + "\nEmail: " + email + "\nSubject: " + subject + "\n\n" + message,
       }),
     });
     const result = await response.json().catch(() => ({}));
