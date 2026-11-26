@@ -283,6 +283,14 @@ document.addEventListener("DOMContentLoaded", () => {
     banner.setAttribute("aria-label", "Cookie choices");
     banner.hidden = Boolean(saved);
     banner.innerHTML = '<h2>Your privacy choices</h2><p>We use necessary browser storage for core site functions and optional storage to remember preferences. Analytics and advertising are not currently activated by this panel. Read our <a href="/cookies.html">Cookie Policy</a> and <a href="/privacy.html">Privacy Policy</a>.</p><div class="cookie-consent-actions"><button type="button" class="cookie-primary" data-cookie-accept>Accept optional</button><button type="button" class="cookie-secondary" data-cookie-reject>Reject optional</button><button type="button" class="cookie-secondary" data-cookie-customise>Customise</button></div>';
+    const manage = document.createElement("button");
+    manage.type = "button";
+    manage.id = "pcmCookieManage";
+    manage.className = "cookie-manage-button";
+    manage.textContent = "Cookie settings";
+    manage.setAttribute("aria-label", "Manage cookie settings");
+    manage.hidden = !saved;
+
     const panel = document.createElement("section");
     panel.id = "pcmCookieSettings";
     panel.className = "cookie-settings-panel";
@@ -291,17 +299,18 @@ document.addEventListener("DOMContentLoaded", () => {
     panel.setAttribute("aria-modal", "true");
     panel.setAttribute("aria-labelledby", "pcmCookieSettingsTitle");
     panel.innerHTML = '<h2 id="pcmCookieSettingsTitle">Cookie settings</h2><p>Necessary storage is always on. Choose whether optional categories may be used. Your choices can be changed later from the Cookie Policy page.</p><div class="cookie-setting-row"><div><strong>Necessary</strong><small>Required for security, sign-in and saving your consent choice.</small></div><input type="checkbox" checked disabled aria-label="Necessary storage always enabled"></div><div class="cookie-setting-row"><div><strong>Preferences</strong><small>Remembers choices such as appearance and colour theme.</small></div><input type="checkbox" id="pcmConsentPreferences"></div><div class="cookie-setting-row"><div><strong>Analytics</strong><small>Reserved for analytics tools if they are added in the future.</small></div><input type="checkbox" id="pcmConsentAnalytics"></div><div class="cookie-setting-row"><div><strong>Advertising</strong><small>Reserved for advertising technologies if they are added in the future.</small></div><input type="checkbox" id="pcmConsentAdvertising"></div><div class="cookie-consent-actions"><button type="button" class="cookie-primary" data-cookie-save>Save choices</button><button type="button" class="cookie-secondary" data-cookie-accept-all>Accept all optional</button><button type="button" class="cookie-secondary" data-cookie-cancel>Cancel</button></div>';
-    document.body.append(banner, panel);
+    document.body.append(banner, panel, manage);
     const pref = panel.querySelector("#pcmConsentPreferences");
     const analytics = panel.querySelector("#pcmConsentAnalytics");
     const advertising = panel.querySelector("#pcmConsentAdvertising");
     function fill(value) { pref.checked = value.preferences; analytics.checked = value.analytics; advertising.checked = value.advertising; }
-    function showSettings() { fill(read() || defaults); panel.hidden = false; banner.hidden = true; pref.focus(); }
-    function hideSettings() { panel.hidden = true; if (!read()) banner.hidden = false; }
-    function complete(value) { save(value); banner.hidden = true; panel.hidden = true; }
+    function showSettings() { fill(read() || defaults); panel.hidden = false; banner.hidden = true; manage.hidden = true; pref.focus(); }
+    function hideSettings() { panel.hidden = true; if (!read()) banner.hidden = false; else manage.hidden = false; }
+    function complete(value) { save(value); banner.hidden = true; panel.hidden = true; manage.hidden = false; }
     banner.querySelector("[data-cookie-accept]").addEventListener("click", () => complete({ preferences: true, analytics: true, advertising: true }));
     banner.querySelector("[data-cookie-reject]").addEventListener("click", () => complete(defaults));
     banner.querySelector("[data-cookie-customise]").addEventListener("click", showSettings);
+    manage.addEventListener("click", showSettings);
     panel.querySelector("[data-cookie-save]").addEventListener("click", () => complete({ preferences: pref.checked, analytics: analytics.checked, advertising: advertising.checked }));
     panel.querySelector("[data-cookie-accept-all]").addEventListener("click", () => complete({ preferences: true, analytics: true, advertising: true }));
     panel.querySelector("[data-cookie-cancel]").addEventListener("click", hideSettings);
