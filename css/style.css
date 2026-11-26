@@ -2617,3 +2617,16 @@ input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-vis
 .story-search-box input:focus { outline: 3px solid rgba(104,115,75,.2); border-color: #68734b; }
 .story-search-results { margin-top: 18px; }
 .story-search-results[hidden] { display: none !important; }
+
+
+/* Story sharing controls */
+.story-card-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+.story-card-actions .read-story{margin:0}
+.story-share{margin:34px 0;padding:22px;border:1px solid var(--border,#d9dfe8);border-radius:14px;background:var(--surface,#f8fafc)}
+.story-share h2{margin:0 0 8px;font-size:22px}
+.story-share p{line-height:1.6}
+.story-share-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.story-share-actions .button{min-width:112px}
+#shareStoryMessage{min-height:1.4em;margin:10px 0 0;font-size:14px}
+:root[data-pcm-mode="dark"] .story-share{background:#172033;border-color:#344158}
+@media(max-width:480px){.story-share{padding:16px}.story-share-actions .button{flex:1 1 42%;min-width:0}}
