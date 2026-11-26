@@ -163,9 +163,6 @@
       <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like</button><button type="button" id="saveStory" class="button button-outline">☆ Save Story</button><span id="likeMessage" role="status"></span><span id="saveMessage" role="status"></span></div>
 `;
 
-    document.querySelectorAll(".story-share-button").forEach((button) => {
-      button.addEventListener("click", () => shareStory(button.dataset.shareTitle || "A story", button.dataset.shareUrl));
-    });
     const detailShareUrl = new URL("/stories/" + encodeURIComponent(story.slug || story.id) + "/", window.location.origin).href;
     const detailShareLinks = shareLinks(story.title, detailShareUrl);
     const nativeShareButton = document.getElementById("nativeShareStory");
@@ -303,6 +300,10 @@
   }
 
   ready(() => {
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest(".story-share-button");
+      if (button) shareStory(button.dataset.shareTitle || "A story", button.dataset.shareUrl);
+    });
     loadPublicStories();
     loadStoryPage();
   });
