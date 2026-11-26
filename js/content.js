@@ -151,7 +151,7 @@
       ${story.excerpt ? `<p class="story-detail-excerpt">${escapeHtml(story.excerpt)}</p>` : ""}
       <div class="story-detail-meta">Published ${story.published_at ? new Date(story.published_at).toLocaleDateString() : ""}</div>
       <div class="story-detail-content">${escapeHtml(story.content).replace(/\n/g, "<br>")}</div>
-      <section class="story-share" aria-label="Share this story"><h2>Share this story</h2><p>Choose where you want to share this story, or copy its link.</p><div class="story-share-actions"><button type="button" class="button button-primary" id="nativeShareStory">Share with an app</button><button type="button" class="button button-outline" id="copyShareStory">Copy link</button></div><p id="shareStoryMessage" role="status" aria-live="polite"></p></section>
+      <section class="story-share" aria-label="Share this story"><h2>Share this story</h2><p>Choose where you want to share this story, or copy its link.</p><div class="story-share-actions"><button type="button" class="button button-primary" id="nativeShareStory">Share</button><button type="button" class="button button-outline" id="copyShareStory">Copy link</button></div><p id="shareStoryMessage" role="status" aria-live="polite"></p></section>
       <div class="story-reactions"><button type="button" id="likeStory" class="button button-outline">♡ Like</button><button type="button" id="saveStory" class="button button-outline">☆ Save Story</button><span id="likeMessage" role="status"></span><span id="saveMessage" role="status"></span></div>
 `;
 
@@ -165,7 +165,7 @@
         await navigator.clipboard.writeText(detailShareUrl);
         shareStoryMessage.textContent = "Story link copied.";
       } catch (_) {
-        shareStoryMessage.textContent = "Copy is unavailable in this browser. Use Share with an app instead.";
+        shareStoryMessage.textContent = "Copy is unavailable in this browser. Use Share instead.";
       }
     });
 
