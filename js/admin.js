@@ -151,10 +151,23 @@
       await loadStories();
     }
 
+    async function requestStoryPageBuild() {
+      const { data, error } = await c.functions.invoke("trigger-story-page-build", { body: {} });
+      if (error) throw error;
+      return data;
+    }
     async function togglePublish(story) {
       const next = !story.published;
       const { error } = await c.from("stories").update({ published: next, published_at: next ? new Date().toISOString() : null, updated_at: new Date().toISOString() }).eq("id", story.id);
       if (error) return alert(error.message);
+      let buildMessage = next ? "Story published." : "Story unpublished.";
+      try {
+        await requestStoryPageBuild();
+        buildMessage += " Static story pages are being refreshed now.";
+      } catch (buildError) {
+        buildMessage += " The page refresh could not be started automatically: " + (buildError.message || "Unknown error");
+      }
+      alert(buildMessage);
       await Promise.all([loadStories(), loadOverview()]);
     }
     async function deleteStory(story) {
@@ -229,7 +242,16 @@
       if (id) result = await c.from("stories").update(payload).eq("id", id);
       else result = await c.from("stories").insert({ ...payload, created_by: currentUser.id });
       if (result.error) return setStatus("storyMessage", result.error.message, true);
-      setStatus("storyMessage", id ? "Story updated." : "Story created.", false);
+      let saveMessage = id ? "Story updated." : "Story created.";
+      if (published) {
+        try {
+          await requestStoryPageBuild();
+          saveMessage += " Static story pages are being refreshed now.";
+        } catch (buildError) {
+          saveMessage += " Automatic page refresh could not be started: " + (buildError.message || "Unknown error");
+        }
+      }
+      setStatus("storyMessage", saveMessage, false);
       event.target.reset();
       document.getElementById("storyId").value = "";
       document.getElementById("storyFormHeading").textContent = "Add a story";
