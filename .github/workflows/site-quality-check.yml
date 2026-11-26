@@ -8,6 +8,9 @@ on:
       - "*.html"
       - "**/*.html"
       - "css/**"
+      - "*.css"
+      - "*.mjs"
+      - "supabase/**"
       - "share-service/**"
       - "scripts/**"
       - ".github/workflows/site-quality-check.yml"
@@ -38,6 +41,19 @@ jobs:
 
       - name: Check story page generator syntax
         run: node --check scripts/generate-story-pages.mjs
+
+      - name: Set up Deno for Supabase Edge Functions
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Type-check Supabase Edge Functions
+        run: |
+          set -e
+          for file in supabase/functions/*/index.ts; do
+            echo "Checking $file"
+            deno check "$file"
+          done
 
       - name: Check sharing service JavaScript syntax
         run: npm --prefix share-service run check
