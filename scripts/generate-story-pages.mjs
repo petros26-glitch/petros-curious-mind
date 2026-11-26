@@ -15,7 +15,7 @@ if (!response.ok) throw new Error("Supabase returned HTTP " + response.status + 
 const stories = JSON.parse(responseBody);
 if (!Array.isArray(stories)) throw new Error("Supabase returned an unexpected stories response.");
 
-const base = "https://www.petroscuriousmind.name.ng";
+const base = "https://petroscuriousmind.name.ng";
 const logoUrl = base + "/images/logo.png";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
