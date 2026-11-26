@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/social-preview-check.yml"
+      - "workers/story-preview/**"
   workflow_dispatch:
   schedule:
     - cron: "17 */6 * * *"
@@ -92,6 +93,9 @@ jobs:
               og_type = parser.meta.get("og:type", "")
 
               print(f"HTTP: {status}")
+              print(f"x-pcm-worker: {headers.get('x-pcm-worker', '')}")
+              print(f"x-pcm-preview: {headers.get('x-pcm-preview', '')}")
+              print(f"content-type: {headers.get('Content-Type', '')}")
               print(f"og:title: {title}")
               print(f"og:image: {image}")
               print(f"og:type: {og_type}")
