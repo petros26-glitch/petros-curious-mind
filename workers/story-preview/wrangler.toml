@@ -15,11 +15,13 @@ SUPABASE_URL = "https://lysfuszocmawivdlijqy.supabase.co"
 SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cElo0TKdntMQ25tb9UqwqA_OZXzMqz2"
 HOME_IMAGE = "https://petroscuriousmind.name.ng/images/logo.png"
 
-# Routes keep Render as the origin. Do not replace these with Custom Domains.
+# The Worker is the apex hostname entry point and reverse-proxies normal site traffic to Render.
+# Using a Custom Domain avoids the apex Route that was not invoking consistently.
 [[routes]]
-pattern = "petroscuriousmind.name.ng/*"
-zone_name = "petroscuriousmind.name.ng"
+pattern = "petroscuriousmind.name.ng"
+custom_domain = true
 
+# Keep www on its existing Route; it already invokes the preview Worker correctly.
 [[routes]]
 pattern = "www.petroscuriousmind.name.ng/*"
 zone_name = "petroscuriousmind.name.ng"
