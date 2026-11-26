@@ -50,7 +50,7 @@
       const draftTarget = document.getElementById("adminDraftStories");
       publishedTarget.textContent = "Loading published stories…";
       draftTarget.textContent = "Loading unpublished stories…";
-      const { data, error } = await c.from("stories").select("id,title,slug,published,featured,created_at")
+      const { data, error } = await c.from("stories").select("id,title,slug,published,featured,created_at,published_at")
         .is("deleted_at", null).order("created_at", { ascending: false });
       if (error) {
         publishedTarget.textContent = error.message;
@@ -158,7 +158,8 @@
     }
     async function togglePublish(story) {
       const next = !story.published;
-      const { error } = await c.from("stories").update({ published: next, published_at: next ? new Date().toISOString() : null, updated_at: new Date().toISOString() }).eq("id", story.id);
+      const nextPublishedAt = story.published_at || (next ? new Date().toISOString() : null);
+      const { error } = await c.from("stories").update({ published: next, published_at: nextPublishedAt, updated_at: new Date().toISOString() }).eq("id", story.id);
       if (error) return alert(error.message);
       let buildMessage = next ? "Story published." : "Story unpublished.";
       try {
@@ -201,9 +202,26 @@
           " · Moved to trash " + new Date(story.deleted_at).toLocaleString();
         details.append(title, meta);
         const actions = document.createElement("div"); actions.className = "admin-actions";
-        actions.append(makeButton("Restore", () => restoreStory(story), "button button-primary"));
+        actions.append(
+          makeButton("Restore", () => restoreStory(story), "button button-primary"),
+          makeButton("Delete Permanently", () => permanentlyDeleteStory(story), "button button-danger")
+        );
         row.append(details, actions); target.appendChild(row);
       });
+    }
+
+    async function permanentlyDeleteStory(story) {
+      const confirmed = confirm(`Permanently delete "${story.title}"? This cannot be undone. The story will be removed from the website database and its current private backup files.`);
+      if (!confirmed) return;
+      const typed = prompt(`To confirm permanent deletion, type DELETE for "${story.title}".`);
+      if (typed !== "DELETE") return alert("Permanent deletion cancelled. The confirmation text did not match.");
+      const { error } = await c.from("stories").delete().eq("id", story.id).not("deleted_at", "is", null);
+      if (error) return alert("The story could not be permanently deleted: " + error.message);
+      let message = "Story permanently deleted from the website. Its private backup files are queued for removal by the backup service (normally within five minutes).";
+      try { await requestStoryPageBuild(); message += " Published story pages and the sitemap are being refreshed."; }
+      catch (buildError) { message += " The static page refresh could not be started: " + (buildError.message || "Unknown error"); }
+      alert(message);
+      await Promise.all([loadTrash(), loadStories(), loadOverview()]);
     }
 
     async function restoreStory(story) {
@@ -223,8 +241,15 @@
       const published = document.getElementById("storyPublished").checked;
       if (!title || !content) return setStatus("storyMessage", "Title and story content are required.", true);
       const { data: { user: currentUser } } = await c.auth.getUser();
+      let existingStory = null;
+      if (id) {
+        const { data, error } = await c.from("stories").select("published_at").eq("id", id).single();
+        if (error) return setStatus("storyMessage", "The existing publication date could not be checked: " + error.message, true);
+        existingStory = data;
+      }
       const baseSlug = slugify(title) || "story";
-      const payload = { title, slug: baseSlug + "-" + (id ? id.slice(0, 6) : crypto.randomUUID().slice(0, 6)), excerpt, content, featured, published, published_at: published ? new Date().toISOString() : null, updated_at: new Date().toISOString() };
+      const firstPublishedAt = existingStory?.published_at || (published ? new Date().toISOString() : null);
+      const payload = { title, slug: baseSlug + "-" + (id ? id.slice(0, 6) : crypto.randomUUID().slice(0, 6)), excerpt, content, featured, published, published_at: firstPublishedAt, updated_at: new Date().toISOString() };
       const imageUrl = document.getElementById("storyImageUrl").value.trim();
       if (imageUrl) {
         let parsedImageUrl;
