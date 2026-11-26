@@ -106,6 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function readPreferences() {
+    if (!window.PCMCookieConsent || !window.PCMCookieConsent.has("preferences")) {
+      return { mode: "light", theme: "olive" };
+    }
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       return {
@@ -120,7 +123,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyPreferences(preferences) {
     document.documentElement.dataset.pcmMode = preferences.mode;
     document.documentElement.dataset.pcmTheme = preferences.theme;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences)); } catch (error) {}
+    try {
+      if (window.PCMCookieConsent && window.PCMCookieConsent.has("preferences")) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (error) {}
     document.querySelectorAll("[data-pcm-mode-choice]").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.pcmModeChoice === preferences.mode));
     });
@@ -243,7 +252,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function save(value) {
     const consent = { necessary: true, preferences: value.preferences === true, analytics: value.analytics === true, advertising: value.advertising === true, updatedAt: new Date().toISOString() };
-    try { localStorage.setItem(KEY, JSON.stringify(consent)); } catch (error) {}
+    try {
+      localStorage.setItem(KEY, JSON.stringify(consent));
+      if (!consent.preferences) localStorage.removeItem("pcm-visitor-preferences");
+    } catch (error) {}
     window.dispatchEvent(new CustomEvent("pcm:consent-changed", { detail: consent }));
     return consent;
   }
