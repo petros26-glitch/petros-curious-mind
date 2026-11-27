@@ -135,8 +135,81 @@
       previewImage.onerror = () => { previewMessage.textContent = "The image could not be loaded. Check that the URL is a public, direct image link."; };
       previewImage.src = value;
     }
+
     imageUrlInput.addEventListener("input", updateImagePreview);
     imageUrlInput.addEventListener("change", updateImagePreview);
+
+    // Offline, whole-text story description suggestions. Nothing is saved until the admin saves the story.
+    const generateDescriptionsButton = document.getElementById("generateStoryDescriptions");
+    const descriptionOptions = document.getElementById("descriptionOptions");
+    const descriptionMessage = document.getElementById("descriptionGeneratorMessage");
+    const useDescriptionButton = document.getElementById("useStoryDescription");
+    let selectedDescription = "";
+    function clearDescriptionSuggestions(message) {
+      selectedDescription = "";
+      descriptionOptions.replaceChildren();
+      useDescriptionButton.hidden = true;
+      descriptionMessage.textContent = message || "";
+      descriptionMessage.className = "admin-message";
+    }
+    generateDescriptionsButton.addEventListener("click", () => {
+      const storyText = document.getElementById("storyContent").value.trim();
+      const storyTitle = document.getElementById("storyTitle").value.trim();
+      if (!storyText) {
+        clearDescriptionSuggestions("Paste the complete story first, then generate its description options.");
+        return;
+      }
+      if (!window.PCMStoryDescriptionGenerator) {
+        clearDescriptionSuggestions("The description generator did not load. Refresh the page and try again.");
+        return;
+      }
+      generateDescriptionsButton.disabled = true;
+      generateDescriptionsButton.textContent = "Analysing story…";
+      clearDescriptionSuggestions("");
+      try {
+        const result = window.PCMStoryDescriptionGenerator.generate(storyTitle, storyText);
+        if (!result.options || !result.options.length) {
+          clearDescriptionSuggestions(result.message || "There is not enough story text to create descriptions.");
+          return;
+        }
+        result.options.forEach((option, index) => {
+          const label = document.createElement("label");
+          label.className = "description-option";
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "generatedStoryDescription";
+          radio.value = String(index);
+          radio.checked = index === 0;
+          const text = document.createElement("span");
+          text.textContent = option;
+          radio.addEventListener("change", () => { selectedDescription = option; });
+          label.append(radio, text);
+          descriptionOptions.appendChild(label);
+        });
+        selectedDescription = result.options[0];
+        descriptionMessage.textContent = result.message || "Choose the description you prefer.";
+        useDescriptionButton.hidden = false;
+      } catch (error) {
+        clearDescriptionSuggestions("The description could not be generated. Please check the story text and try again.");
+      } finally {
+        generateDescriptionsButton.disabled = false;
+        generateDescriptionsButton.textContent = "Generate 3 options";
+      }
+    });
+    useDescriptionButton.addEventListener("click", () => {
+      if (!selectedDescription) return;
+      const excerptField = document.getElementById("storyExcerpt");
+      excerptField.value = selectedDescription;
+      excerptField.dispatchEvent(new Event("input", { bubbles: true }));
+      excerptField.focus();
+      descriptionMessage.textContent = "Selected description added to the Short Description field. You can edit it before saving.";
+    });
+    document.getElementById("storyContent").addEventListener("input", () => {
+      if (descriptionOptions.childElementCount) clearDescriptionSuggestions("Story text changed. Generate new options so the descriptions match the updated story.");
+    });
+    document.getElementById("storyTitle").addEventListener("input", () => {
+      if (descriptionOptions.childElementCount) clearDescriptionSuggestions("Story title changed. Generate new options to include the updated title.");
+    });
 
     function slugify(value) {
       return value.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
