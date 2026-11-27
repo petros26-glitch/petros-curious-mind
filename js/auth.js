@@ -87,6 +87,24 @@
   }
 
   ready(async () => {
+    const showPassword = document.getElementById("showPassword");
+    if (showPassword) {
+      showPassword.addEventListener("change", () => {
+        const field = document.getElementById("password");
+        if (field) field.type = showPassword.checked ? "text" : "password";
+      });
+    }
+
+    const showPasswords = document.getElementById("showPasswords");
+    if (showPasswords) {
+      showPasswords.addEventListener("change", () => {
+        ["password", "confirmPassword"].forEach((id) => {
+          const field = document.getElementById(id);
+          if (field) field.type = showPasswords.checked ? "text" : "password";
+        });
+      });
+    }
+
     const client = getClient();
     if (!client) {
       const signUpForm = document.getElementById("signupForm");
@@ -215,24 +233,6 @@
         const requestedNext = new URLSearchParams(window.location.search).get("next");
         const safeNext = requestedNext && /^[a-z0-9-]+\.html$/i.test(requestedNext) ? requestedNext : "index.html";
         window.location.href = safeNext;
-      });
-    }
-
-    const showPassword = document.getElementById("showPassword");
-    if (showPassword) {
-      showPassword.addEventListener("change", () => {
-        const field = document.getElementById("password");
-        if (field) field.type = showPassword.checked ? "text" : "password";
-      });
-    }
-
-    const showPasswords = document.getElementById("showPasswords");
-    if (showPasswords) {
-      showPasswords.addEventListener("change", () => {
-        ["password", "confirmPassword"].forEach((id) => {
-          const field = document.getElementById(id);
-          if (field) field.type = showPasswords.checked ? "text" : "password";
-        });
       });
     }
 
