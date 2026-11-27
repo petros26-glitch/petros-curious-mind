@@ -88,7 +88,30 @@
 
   ready(async () => {
     const client = getClient();
-    if (!client) return;
+    if (!client) {
+      const signUpForm = document.getElementById("signupForm");
+      if (signUpForm) {
+        signUpForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          setMessage(document.getElementById("signupMessage"), "The account service could not load. Refresh the page and try again. Your details have not been submitted.", true);
+        });
+      }
+      const signInForm = document.getElementById("signinForm");
+      if (signInForm) {
+        signInForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          setMessage(document.getElementById("signinMessage"), "The account service could not load. Refresh the page and try again. Your details have not been submitted.", true);
+        });
+      }
+      const passwordForm = document.getElementById("password-form");
+      if (passwordForm) {
+        passwordForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          setMessage(document.getElementById("password-message"), "The account service could not load. Refresh the page and try again.", true);
+        });
+      }
+      return;
+    }
 
     await updateNavigation();
     client.auth.onAuthStateChange(() => {
