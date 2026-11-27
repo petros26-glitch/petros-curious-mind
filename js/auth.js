@@ -111,15 +111,23 @@
         const submit = signUpForm.querySelector('[type="submit"]');
         submit.disabled = true;
         submit.textContent = "Creating account…";
-        const { data, error } = await client.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { full_name: fullName },
-          }
-        });
+        let signupResult;
+        try {
+          signupResult = await client.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { full_name: fullName },
+            }
+          });
+        } catch (requestError) {
+          submit.disabled = false;
+          submit.innerHTML = 'Create Account <span aria-hidden="true">→</span>';
+          return setMessage(message, requestError?.message || "We could not reach the account service. Check your connection and try again.", true);
+        }
+        const { data, error } = signupResult;
         submit.disabled = false;
-        submit.textContent = "Create Account →";
+        submit.innerHTML = 'Create Account <span aria-hidden="true">→</span>';
 
         if (error) return setMessage(message, error.message, true);
         if (data.session) {
@@ -152,7 +160,7 @@
           );
           window.setTimeout(() => { window.location.href = "profile.html"; }, 2200);
         } else {
-          setMessage(message, "Your account was created, but email confirmation is still enabled in the authentication settings. Please contact the site administrator.", true);
+          setMessage(message, "Your account has been created. Check your email inbox and spam folder for the confirmation link, then return here to sign in.", false);
           signUpForm.reset();
         }
       });
@@ -168,9 +176,17 @@
         const submit = signInForm.querySelector('[type="submit"]');
         submit.disabled = true;
         submit.textContent = "Signing in…";
-        const { error } = await client.auth.signInWithPassword({ email, password });
+        let signinResult;
+        try {
+          signinResult = await client.auth.signInWithPassword({ email, password });
+        } catch (requestError) {
+          submit.disabled = false;
+          submit.innerHTML = 'Sign In <span aria-hidden="true">→</span>';
+          return setMessage(message, requestError?.message || "We could not reach the account service. Check your connection and try again.", true);
+        }
+        const { error } = signinResult;
         submit.disabled = false;
-        submit.textContent = "Sign In →";
+        submit.innerHTML = 'Sign In <span aria-hidden="true">→</span>';
         if (error) return setMessage(message, error.message, true);
         setMessage(message, "Signed in successfully. Opening your account…", false);
         const requestedNext = new URLSearchParams(window.location.search).get("next");
