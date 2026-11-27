@@ -363,6 +363,7 @@
       }
       setStatus("storyMessage", saveMessage, false);
       event.target.reset();
+      clearDescriptionSuggestions("Story saved. You can generate descriptions for your next story.");
       document.getElementById("storyId").value = "";
       document.getElementById("storyFormHeading").textContent = "Add a story";
       document.getElementById("storySubmitButton").textContent = "Save Story";
@@ -373,6 +374,7 @@
     document.getElementById("cancelStoryEdit").addEventListener("click", () => document.getElementById("resetStoryForm").click());
     document.getElementById("resetStoryForm").addEventListener("click", () => {
       document.getElementById("storyForm").reset();
+      clearDescriptionSuggestions("Paste a story and generate fresh description options whenever you are ready.");
       document.getElementById("storyId").value = "";
       document.getElementById("storyFormHeading").textContent = "Add a story";
       document.getElementById("storySubmitButton").textContent = "Save Story";
